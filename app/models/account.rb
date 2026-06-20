@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  has_one_attached :logo
+
   has_many :users, dependent: :destroy
   has_many :clients, dependent: :destroy
   has_many :invoices, dependent: :destroy

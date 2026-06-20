@@ -27,11 +27,11 @@ class InvoiceMailer < ApplicationMailer
 
   def generate_pdf(invoice)
     WickedPdf.new.pdf_from_string(
-      ActionController::Base.new.render_to_string(
+      ApplicationController.render(
         template: "invoices/show",
-        formats: [ :html ],
-        layout: false,
-        locals: { :@invoice => invoice, :@current_account => invoice.account }
+        formats: [ :pdf ],
+        layout: "pdf",
+        assigns: { invoice: invoice }
       )
     )
   end

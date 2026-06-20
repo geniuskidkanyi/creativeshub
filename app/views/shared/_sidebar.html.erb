@@ -1,5 +1,5 @@
-<aside class="w-56 h-screen sticky top-0 bg-sidebar border-r border-sidebar-border flex flex-col">
-  <div class="px-5 pt-6 pb-4">
+<aside data-sidebar-target="sidebar" class="hidden lg:flex lg:flex-col fixed lg:sticky top-0 left-0 z-50 lg:z-auto h-screen w-56 bg-sidebar border-r border-sidebar-border flex-col">
+  <div class="px-5 pt-6 pb-4 flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <div class="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
         <svg class="w-4 h-4 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -9,6 +9,9 @@
       </div>
       <span class="text-lg text-sidebar-foreground tracking-tight" style="font-family: var(--font-display)">CreativesHub</span>
     </div>
+    <button type="button" data-action="sidebar#close" class="lg:hidden p-1 text-muted-foreground hover:text-sidebar-foreground transition-colors">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
 
   <nav class="flex-1 px-3 space-y-1">
@@ -40,17 +43,31 @@
     <% end %>
   </div>
 
-  <div class="px-3 pb-5 mt-auto border-t border-sidebar-border">
-    <div class="flex items-center gap-3 px-3 py-3">
-      <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-medium">
+  <div class="px-3 pb-5 mt-auto border-t border-sidebar-border relative" data-controller="dropdown">
+    <button data-action="dropdown#toggle" class="w-full flex items-center gap-3 px-3 py-3 rounded-md hover:bg-sidebar-accent/50 transition-colors text-left">
+      <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-medium shrink-0">
         <%= current_user.name.first.upcase %>
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-sm text-sidebar-foreground truncate"><%= current_user.name %></p>
         <p class="text-xs text-muted-foreground truncate"><%= current_account.business_name %></p>
       </div>
-      <%= button_to destroy_user_session_path, method: :delete, class: "text-muted-foreground hover:text-sidebar-foreground transition-colors", form_class: "flex" do %>
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <svg class="w-4 h-4 text-muted-foreground shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div data-dropdown-target="menu" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-popover border border-border rounded-md shadow-lg py-1 z-50">
+      <%= link_to edit_user_registration_path, class: "flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors" do %>
+        <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Edit Profile
+      <% end %>
+      <%= link_to edit_account_path, class: "flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors" do %>
+        <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Business Settings
+      <% end %>
+      <div class="mx-2 my-1 border-t border-border"></div>
+      <%= button_to destroy_user_session_path, method: :delete, class: "w-full flex items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-muted/50 transition-colors" do %>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
       <% end %>
     </div>
   </div>

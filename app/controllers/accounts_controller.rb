@@ -23,8 +23,12 @@ class AccountsController < ApplicationController
   def update
     @account = current_account
 
+    if params[:remove_logo] == "1"
+      @account.logo.purge
+    end
+
     if @account.update(account_params)
-      redirect_to dashboard_path, notice: "Account updated successfully."
+      redirect_to edit_account_path, notice: "Settings saved successfully."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -33,6 +37,6 @@ class AccountsController < ApplicationController
   private
 
   def account_params
-    params.require(:account).permit(:business_name, :address, :phone, :website, :tax_id, :currency, :timezone)
+    params.require(:account).permit(:business_name, :address, :phone, :website, :tax_id, :currency, :timezone, :logo)
   end
 end

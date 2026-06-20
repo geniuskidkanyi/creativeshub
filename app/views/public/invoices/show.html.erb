@@ -1,12 +1,16 @@
 <div class="min-h-screen bg-background">
   <div class="max-w-3xl mx-auto px-4 py-12">
     <div class="text-center mb-8">
-      <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-        </svg>
-      </div>
+      <% if @account.logo.attached? %>
+        <%= image_tag @account.logo.variant(resize_to_limit: [240, 100]), class: "h-12 mx-auto mb-3 object-contain" %>
+      <% else %>
+        <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+      <% end %>
       <p class="text-xs text-muted-foreground uppercase tracking-widest mb-1">Invoice from</p>
       <h1 class="text-xl text-foreground" style="font-family: var(--font-display)"><%= @account.business_name %></h1>
     </div>

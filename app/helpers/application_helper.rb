@@ -18,4 +18,13 @@ module ApplicationHelper
     else "text-muted-foreground bg-muted"
     end
   end
+
+  def base64_logo(account)
+    return unless account.logo.attached?
+
+    logo = account.logo.variant(resize_to_limit: [400, 160]).processed
+    data = Base64.strict_encode64(logo.download)
+    mime = logo.blob.content_type
+    "data:#{mime};base64,#{data}"
+  end
 end
