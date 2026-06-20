@@ -1,0 +1,123 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema[8.1].define(version: 2026_06_20_224019) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
+  create_table "accounts", force: :cascade do |t|
+    t.text "address"
+    t.string "business_name"
+    t.datetime "created_at", null: false
+    t.string "currency"
+    t.string "logo"
+    t.string "phone"
+    t.string "tax_id"
+    t.string "timezone"
+    t.datetime "updated_at", null: false
+    t.string "website"
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.text "address"
+    t.string "company"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "phone"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_clients_on_account_id"
+  end
+
+  create_table "invoice_items", force: :cascade do |t|
+    t.decimal "amount"
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.bigint "invoice_id", null: false
+    t.decimal "quantity"
+    t.decimal "unit_price"
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_invoice_items_on_invoice_id"
+  end
+
+  create_table "invoices", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.date "due_date"
+    t.string "invoice_number"
+    t.date "issue_date"
+    t.text "notes"
+    t.datetime "paid_date"
+    t.string "payment_method"
+    t.string "public_token"
+    t.string "status"
+    t.decimal "subtotal"
+    t.decimal "tax_amount"
+    t.decimal "tax_rate"
+    t.decimal "total_amount"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_invoices_on_account_id"
+    t.index ["client_id"], name: "index_invoices_on_client_id"
+    t.index ["public_token"], name: "index_invoices_on_public_token", unique: true
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.decimal "amount"
+    t.string "client_reference"
+    t.datetime "created_at", null: false
+    t.string "currency"
+    t.bigint "invoice_id", null: false
+    t.jsonb "metadata"
+    t.datetime "paid_at"
+    t.string "payment_method"
+    t.string "status"
+    t.string "transaction_reference"
+    t.datetime "updated_at", null: false
+    t.string "waychit_id"
+    t.jsonb "webhook_data"
+    t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.bigint "account_id"
+    t.datetime "created_at", null: false
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "name"
+    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
+    t.string "role"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_users_on_account_id"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "webhook_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_id"
+    t.string "event_type"
+    t.jsonb "payload"
+    t.datetime "processed_at"
+    t.string "status"
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "clients", "accounts"
+  add_foreign_key "invoice_items", "invoices"
+  add_foreign_key "invoices", "accounts"
+  add_foreign_key "invoices", "clients"
+  add_foreign_key "payments", "invoices"
+end

@@ -1,0 +1,128 @@
+<div class="px-6 py-6" data-controller="invoice-form client-search"
+     data-client-search-url-value="<%= search_clients_path %>"
+     data-client-search-selected-id-value="<%= @invoice.client_id %>"
+     data-client-search-selected-name-value="<%= @invoice.client.name %>">
+  <div class="mb-6">
+    <%= link_to "← Invoices", invoices_path, class: "text-xs text-muted-foreground hover:text-foreground transition-colors" %>
+    <h1 class="text-2xl text-foreground mt-3" style="font-family: var(--font-display)">Edit Invoice</h1>
+  </div>
+
+  <%= form_for @invoice do |f| %>
+    <% if @invoice.errors.any? %>
+      <div class="rounded-md bg-destructive/10 border border-destructive/30 p-4 mb-6">
+        <ul class="list-disc pl-5 space-y-1 text-sm text-destructive-foreground">
+          <% @invoice.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Invoice Details</h2>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <%= f.label :client_id, "Client", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <div class="relative">
+            <%= f.hidden_field :client_id, data: { client_search_target: "hidden" } %>
+            <input type="text"
+                   data-client-search-target="input"
+                   data-action="input->client-search#search focus->client-search#focus"
+                   placeholder="Search clients..."
+                   autocomplete="off"
+                   class="w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+            <button type="button" data-action="click->client-search#clearSelection" class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div data-client-search-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div data-client-search-target="searchResults"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <%= f.label :status, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.select :status, Invoice.statuses.keys.map { |s| [ s.humanize, s ] }, {}, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :issue_date, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= render "shared/date_picker", name: "invoice[issue_date]", value: @invoice.issue_date&.to_s, placeholder: "Select date...", input_class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div>
+          <%= f.label :due_date, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= render "shared/date_picker", name: "invoice[due_date]", value: @invoice.due_date&.to_s, placeholder: "Select date...", input_class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm text-foreground font-medium">Line Items</h2>
+        <button type="button" data-action="invoice-form#add" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Item
+        </button>
+      </div>
+
+      <div data-invoice-form-target="items">
+        <%= f.fields_for :invoice_items do |item_form| %>
+          <div data-invoice-item class="grid grid-cols-12 gap-3 mb-3 items-start">
+            <div class="col-span-5">
+              <%= item_form.text_field :description, placeholder: "Description", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-2">
+              <%= item_form.number_field :quantity, placeholder: "Qty", step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-3">
+              <%= item_form.number_field :unit_price, placeholder: "Price", step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-2 flex items-center pt-2">
+              <%= item_form.hidden_field :_destroy %>
+              <button type="button" data-action="invoice-form#remove" class="text-xs text-muted-foreground hover:text-destructive transition-colors">Remove</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <template data-invoice-form-target="template">
+        <%= f.fields_for :invoice_items, InvoiceItem.new, child_index: "NEW_RECORD" do |item_form| %>
+          <div data-invoice-item class="grid grid-cols-12 gap-3 mb-3 items-start">
+            <div class="col-span-5">
+              <%= item_form.text_field :description, placeholder: "Description", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-2">
+              <%= item_form.number_field :quantity, placeholder: "Qty", step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-3">
+              <%= item_form.number_field :unit_price, placeholder: "Price", step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+            </div>
+            <div class="col-span-2 flex items-center pt-2">
+              <button type="button" data-action="invoice-form#remove" class="text-xs text-muted-foreground hover:text-destructive transition-colors">Remove</button>
+            </div>
+          </div>
+        <% end %>
+      </template>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :tax_rate, "Tax Rate (%)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :tax_rate, step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+      <div class="mt-4">
+        <%= f.label :notes, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+        <%= f.text_area :notes, rows: 3, placeholder: "Payment terms, additional notes...", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "Update Invoice", class: "flex-1 inline-flex justify-center px-4 py-2.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" %>
+      <%= link_to "Cancel", invoices_path, class: "inline-flex justify-center px-4 py-2.5 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" %>
+    </div>
+  <% end %>
+
+  <%= render "shared/client_modal" %>
+</div>

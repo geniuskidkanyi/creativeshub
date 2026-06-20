@@ -1,0 +1,54 @@
+<div class="px-6 py-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Clients</h1>
+      <p class="text-sm text-muted-foreground"><%= @clients.count %> clients</p>
+    </div>
+    <%= link_to new_client_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Add Client
+    <% end %>
+  </div>
+
+  <% if @clients.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @clients.each do |client| %>
+        <div class="bg-card border border-border rounded-lg p-5 hover:border-primary/30 transition-colors">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-medium">
+              <%= client.name.split.map(&:first).join.upcase %>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-sm text-foreground font-medium truncate"><%= client.name %></h3>
+              <% if client.company.present? %>
+                <p class="text-xs text-muted-foreground truncate"><%= client.company %></p>
+              <% end %>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2 text-muted-foreground">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <span class="text-xs truncate"><%= client.email %></span>
+            </div>
+            <% if client.phone.present? %>
+              <div class="flex items-center gap-2 text-muted-foreground">
+                <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span class="text-xs"><%= client.phone %></span>
+              </div>
+            <% end %>
+          </div>
+          <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
+            <div class="text-xs text-muted-foreground"><%= client.invoices.count %> invoices</div>
+            <%= link_to "View", client_path(client), class: "text-xs text-primary hover:text-primary/80" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-card border border-border rounded-lg p-12 text-center">
+      <svg class="w-12 h-12 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <p class="text-muted-foreground mb-4">No clients yet.</p>
+      <%= link_to "Add your first client", new_client_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+    </div>
+  <% end %>
+</div>

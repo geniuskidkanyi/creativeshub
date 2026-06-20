@@ -1,0 +1,136 @@
+<div class="px-6 py-6">
+  <div class="mb-6">
+    <%= link_to "← Invoices", invoices_path, class: "text-xs text-muted-foreground hover:text-foreground transition-colors" %>
+    <div class="flex items-center justify-between mt-3">
+      <div>
+        <h1 class="text-2xl text-foreground" style="font-family: var(--font-display)"><%= @invoice.invoice_number || "Draft Invoice" %></h1>
+        <p class="text-sm text-muted-foreground mt-1"><%= @invoice.client.name %></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <%= link_to invoice_path(@invoice, format: :pdf), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" do %>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        <% end %>
+        <button type="button"
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= public_invoice_url(@invoice.public_token) %>"
+                data-action="clipboard#copy"
+                class="inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors">
+          <span data-clipboard-target="icon">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </span>
+          <span data-clipboard-target="label">Copy Link</span>
+        </button>
+        <% unless @invoice.paid? %>
+          <%= link_to "Edit", edit_invoice_path(@invoice), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" %>
+          <% if @invoice.draft? %>
+            <%= link_to "Mark as Sent", send_invoice_invoice_path(@invoice), data: { turbo_method: :post }, class: "inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors" %>
+          <% end %>
+          <%= link_to "Accept Payment", pay_invoice_path(@invoice), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:brightness-110 transition-all" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-card border border-border rounded-lg p-6">
+    <div class="grid grid-cols-2 gap-8 mb-8">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-2">From</p>
+        <p class="text-sm text-foreground font-medium"><%= current_account.business_name %></p>
+        <% if current_account.address.present? %>
+          <p class="text-sm text-muted-foreground"><%= current_account.address %></p>
+        <% end %>
+        <% if current_account.tax_id.present? %>
+          <p class="text-xs text-muted-foreground mt-1">Tax ID: <%= current_account.tax_id %></p>
+        <% end %>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Bill To</p>
+        <p class="text-sm text-foreground font-medium"><%= @invoice.client.name %></p>
+        <% if @invoice.client.company.present? %>
+          <p class="text-sm text-muted-foreground"><%= @invoice.client.company %></p>
+        <% end %>
+        <p class="text-sm text-muted-foreground"><%= @invoice.client.email %></p>
+      </div>
+    </div>
+
+    <div class="flex gap-8 mb-8">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase">Invoice #</p>
+        <p class="text-sm text-foreground font-medium"><%= @invoice.invoice_number || "—" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase">Issue Date</p>
+        <p class="text-sm text-foreground font-medium"><%= @invoice.issue_date&.strftime("%b %d, %Y") || "—" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase">Due Date</p>
+        <p class="text-sm text-foreground font-medium"><%= @invoice.due_date&.strftime("%b %d, %Y") || "—" %></p>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="text-left py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Description</th>
+            <th class="text-right py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Qty</th>
+            <th class="text-right py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Price</th>
+            <th class="text-right py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% @invoice.invoice_items.each do |item| %>
+            <tr>
+              <td class="py-3 text-sm text-foreground"><%= item.description %></td>
+              <td class="py-3 text-sm text-foreground text-right"><%= item.quantity %></td>
+              <td class="py-3 text-sm text-foreground text-right">D<%= number_with_precision(item.unit_price, precision: 0) %></td>
+              <td class="py-3 text-sm text-foreground text-right font-medium">D<%= number_with_precision(item.amount, precision: 0) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-end border-t border-border pt-4">
+      <div class="w-64 space-y-2">
+        <div class="flex justify-between text-sm text-muted-foreground">
+          <span>Subtotal</span>
+          <span class="text-foreground">D<%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
+        </div>
+        <% if @invoice.tax_rate.to_f > 0 %>
+          <div class="flex justify-between text-sm text-muted-foreground">
+            <span>Tax (<%= @invoice.tax_rate %> %)</span>
+            <span class="text-foreground">D<%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
+          </div>
+        <% end %>
+        <div class="flex justify-between text-base font-medium border-t border-border pt-2">
+          <span class="text-foreground">Total</span>
+          <span class="text-primary">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
+        </div>
+      </div>
+    </div>
+
+    <% if @invoice.notes.present? %>
+      <div class="mt-6 pt-4 border-t border-border">
+        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Notes</p>
+        <p class="text-sm text-foreground"><%= @invoice.notes %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @invoice.payments.succeeded.any? %>
+    <div class="bg-card border border-border rounded-lg p-5 mt-4">
+      <h3 class="text-sm text-foreground font-medium mb-3">Payment History</h3>
+      <% @invoice.payments.succeeded.each do |payment| %>
+        <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0">
+          <div>
+            <p class="text-sm text-foreground font-medium">D<%= number_with_precision(payment.amount, precision: 0) %></p>
+            <p class="text-xs text-muted-foreground"><%= payment.payment_method.humanize %> — <%= payment.paid_at&.strftime("%b %d, %Y %H:%M") %></p>
+          </div>
+          <span class="text-xs text-accent bg-accent/10 px-2 py-0.5 rounded">Succeeded</span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

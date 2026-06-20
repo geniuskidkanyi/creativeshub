@@ -1,0 +1,59 @@
+<div class="px-6 py-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Invoices</h1>
+      <p class="text-sm text-muted-foreground"><%= @invoices.count %> invoices</p>
+    </div>
+    <%= link_to new_invoice_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Invoice
+    <% end %>
+  </div>
+
+  <% if @invoices.any? %>
+    <div class="bg-card border border-border rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-border">
+              <th class="text-left px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Invoice</th>
+              <th class="text-left px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Client</th>
+              <th class="text-left px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Status</th>
+              <th class="text-right px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Amount</th>
+              <th class="text-left px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Date</th>
+              <th class="text-right px-5 py-3 text-xs text-muted-foreground font-medium uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            <% @invoices.each do |invoice| %>
+              <tr class="hover:bg-muted/30 transition-colors">
+                <td class="px-5 py-3.5">
+                  <%= link_to invoice.invoice_number || "Draft", invoice_path(invoice), class: "text-sm text-foreground hover:text-primary transition-colors font-medium" %>
+                </td>
+                <td class="px-5 py-3.5 text-sm text-foreground"><%= invoice.client.name %></td>
+                <td class="px-5 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium <%= status_badge(invoice.status) %>">
+                    <span class="w-1.5 h-1.5 rounded-full <%= status_dot(invoice.status) %>"></span>
+                    <%= invoice.status.humanize %>
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-sm text-foreground text-right font-medium">D<%= number_with_precision(invoice.total_amount || 0, precision: 0) %></td>
+                <td class="px-5 py-3.5 text-sm text-muted-foreground"><%= invoice.issue_date&.strftime("%b %d, %Y") || "—" %></td>
+                <td class="px-5 py-3.5 text-right">
+                  <%= link_to "View", invoice_path(invoice), class: "text-xs text-primary hover:text-primary/80 mr-3" %>
+                  <%= link_to "Delete", invoice_path(invoice), data: { turbo_method: :delete, turbo_confirm: "Delete this invoice?" }, class: "text-xs text-muted-foreground hover:text-destructive" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-card border border-border rounded-lg p-12 text-center">
+      <svg class="w-12 h-12 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+      <p class="text-muted-foreground mb-4">No invoices yet.</p>
+      <%= link_to "Create your first invoice", new_invoice_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,16 @@
+Invoice <%= @invoice.invoice_number %>
+==================================
+
+Dear <%= @client.name %>,
+
+Attached is your invoice from <%= @account.business_name %> for <%= number_to_currency(@invoice.total_amount, unit: "D") %>.
+
+Invoice #: <%= @invoice.invoice_number %>
+Issue Date: <%= @invoice.issue_date&.strftime("%B %d, %Y") %>
+Due Date: <%= @invoice.due_date&.strftime("%B %d, %Y") %>
+
+Please see the attached PDF for full details. Payment can be made online.
+
+Thank you for your business!
+
+<%= @account.business_name %>

@@ -1,0 +1,113 @@
+<div class="px-6 py-6">
+  <div class="mb-8">
+    <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Dashboard</h1>
+    <p class="text-sm text-muted-foreground">Welcome back, <%= current_user.name %>.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-card border border-border rounded-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-muted-foreground uppercase tracking-wider">Total Revenue</span>
+        <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">D<%= number_with_precision(@total_revenue, precision: 0) %></p>
+      <p class="text-xs text-primary"><%= @paid_count %> paid invoices</p>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-muted-foreground uppercase tracking-wider">Outstanding</span>
+        <svg class="w-4 h-4 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+      </div>
+      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">D<%= number_with_precision(@unpaid_amount, precision: 0) %></p>
+      <p class="text-xs text-destructive"><%= @overdue_count %> overdue</p>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-muted-foreground uppercase tracking-wider">Paid Invoices</span>
+        <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)"><%= @paid_count %></p>
+      <p class="text-xs text-muted-foreground">of <%= @invoice_count %> total</p>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-muted-foreground uppercase tracking-wider">Clients</span>
+        <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)"><%= @client_count %></p>
+      <p class="text-xs text-muted-foreground">active clients</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-card border border-border rounded-lg">
+      <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+        <h3 class="text-sm text-foreground font-medium">Recent Invoices</h3>
+        <%= link_to "View all", invoices_path, class: "text-xs text-primary hover:text-primary/80 transition-colors" %>
+      </div>
+      <div class="p-5">
+        <% if @recent_invoices.any? %>
+          <div class="space-y-3">
+            <% @recent_invoices.each do |invoice| %>
+              <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full <%= status_dot(invoice.status) %>"></div>
+                  <div>
+                    <%= link_to invoice.invoice_number, invoice_path(invoice), class: "text-sm text-foreground hover:text-primary transition-colors" %>
+                    <p class="text-xs text-muted-foreground"><%= invoice.client.name %></p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-foreground font-medium">D<%= number_with_precision(invoice.total_amount, precision: 0) %></p>
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs <%= status_badge(invoice.status) %>">
+                    <span class="w-1.5 h-1.5 rounded-full <%= status_dot(invoice.status) %>"></span>
+                    <%= invoice.status.humanize %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-muted-foreground">No invoices yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg">
+      <div class="px-5 py-4 border-b border-border">
+        <h3 class="text-sm text-foreground font-medium">Recent Payments</h3>
+      </div>
+      <div class="p-5">
+        <% if @recent_payments.any? %>
+          <div class="space-y-3">
+            <% @recent_payments.each do |payment| %>
+              <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0">
+                <div>
+                  <p class="text-sm text-foreground font-medium">D<%= number_with_precision(payment.amount, precision: 0) %></p>
+                  <p class="text-xs text-muted-foreground"><%= payment.invoice.client.name %></p>
+                </div>
+                <span class="text-xs text-muted-foreground"><%= payment.paid_at&.strftime("%b %d") %></span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-muted-foreground">No payments yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <%= link_to new_invoice_path, class: "flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create Invoice
+    <% end %>
+    <%= link_to new_client_path, class: "flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors" do %>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Add Client
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<div class="min-h-screen bg-background">
+  <div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <p class="text-xs text-muted-foreground uppercase tracking-widest mb-1">Invoice from</p>
+      <h1 class="text-xl text-foreground" style="font-family: var(--font-display)"><%= @account.business_name %></h1>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-6 mb-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">Invoice</p>
+          <h2 class="text-lg text-foreground" style="font-family: var(--font-display)"><%= @invoice.invoice_number %></h2>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs mt-1 font-medium <%= status_badge(@invoice.status) %>">
+            <span class="w-1.5 h-1.5 rounded-full <%= status_dot(@invoice.status) %>"></span>
+            <%= @invoice.status.humanize %>
+          </span>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl text-primary" style="font-family: var(--font-display)">D<%= number_with_precision(@invoice.total_amount, precision: 0) %></p>
+        </div>
+      </div>
+
+      <div class="border-t border-border pt-4 mb-4">
+        <div class="flex gap-8 text-sm">
+          <div>
+            <p class="text-xs text-muted-foreground uppercase">Issue Date</p>
+            <p class="font-medium text-foreground"><%= @invoice.issue_date&.strftime("%b %d, %Y") || "—" %></p>
+          </div>
+          <div>
+            <p class="text-xs text-muted-foreground uppercase">Due Date</p>
+            <p class="font-medium text-foreground"><%= @invoice.due_date&.strftime("%b %d, %Y") || "—" %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Bill To</p>
+        <p class="text-sm text-foreground font-medium"><%= @invoice.client.name %></p>
+        <% if @invoice.client.company.present? %>
+          <p class="text-sm text-muted-foreground"><%= @invoice.client.company %></p>
+        <% end %>
+        <p class="text-sm text-muted-foreground"><%= @invoice.client.email %></p>
+      </div>
+
+      <table class="w-full mb-6">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="text-left py-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">Description</th>
+            <th class="text-right py-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">Qty</th>
+            <th class="text-right py-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">Price</th>
+            <th class="text-right py-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% @invoice.invoice_items.each do |item| %>
+            <tr>
+              <td class="py-2 text-sm text-foreground"><%= item.description %></td>
+              <td class="py-2 text-sm text-foreground text-right"><%= item.quantity %></td>
+              <td class="py-2 text-sm text-foreground text-right">D<%= number_with_precision(item.unit_price, precision: 0) %></td>
+              <td class="py-2 text-sm text-foreground text-right font-medium">D<%= number_with_precision(item.amount, precision: 0) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="flex justify-end border-t border-border pt-4">
+        <div class="w-64 space-y-2">
+          <div class="flex justify-between text-sm text-muted-foreground">
+            <span>Subtotal</span>
+            <span class="text-foreground">D<%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
+          </div>
+          <% if @invoice.tax_rate.to_f > 0 %>
+            <div class="flex justify-between text-sm text-muted-foreground">
+              <span>Tax (<%= @invoice.tax_rate %> %)</span>
+              <span class="text-foreground">D<%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
+            </div>
+          <% end %>
+          <div class="flex justify-between text-base font-medium border-t border-border pt-2">
+            <span class="text-foreground">Total</span>
+            <span class="text-primary">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
+          </div>
+        </div>
+      </div>
+
+      <% if @invoice.notes.present? %>
+        <div class="mt-6 pt-4 border-t border-border">
+          <p class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Notes</p>
+          <p class="text-sm text-foreground"><%= @invoice.notes %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <% unless @invoice.paid? %>
+      <div class="text-center space-y-4">
+        <p class="text-sm text-foreground font-medium">Choose payment method</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <%= link_to pay_public_invoice_path(@invoice.public_token, method: "payment_request"), class: "inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Pay with Waychit
+          <% end %>
+          <%= link_to pay_public_invoice_path(@invoice.public_token, method: "payment_session"), class: "inline-flex items-center gap-2 px-8 py-3 bg-accent text-accent-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Pay with Card
+          <% end %>
+        </div>
+        <p class="text-xs text-muted-foreground">Waychit app not required for card payments</p>
+      </div>
+    <% else %>
+      <div class="text-center bg-card border border-border rounded-lg p-6">
+        <div class="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <p class="text-foreground font-medium">This invoice has been paid</p>
+        <% if @invoice.paid_date %>
+          <p class="text-xs text-muted-foreground mt-1"><%= @invoice.paid_date.strftime("%B %d, %Y") %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <p class="text-center text-xs text-muted-foreground mt-8">Powered by CreativesHub</p>
+  </div>
+</div>
