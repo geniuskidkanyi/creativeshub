@@ -2,7 +2,7 @@ lock "~> 3.20"
 
 set :application, "smartpay"
 set :repo_url, "git@github.com:geniuskidkanyi/smartpay.git"
-set :branch, ENV.fetch("BRANCH", "main")
+set :branch, ENV.fetch("BRANCH", "modem-pay")
 
 set :deploy_to, "/home/deploy/smartpay"
 
@@ -21,7 +21,7 @@ set :rbenv_ruby, File.read(".ruby-version").strip
 set :puma_preload_app, true
 set :puma_prune_bundler, true
 set :puma_workers, 2
-set :puma_threads, [0, 16]
+set :puma_threads, [0, 4]
 set :puma_bind, "tcp://0.0.0.0:3002"
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"

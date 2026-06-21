@@ -9,5 +9,5 @@ server "95.216.240.245",
 
 set :deploy_to, "/home/deploy/smartpay"
 set :rails_env, :production
-set :branch, ENV.fetch("BRANCH", "main")
+set :branch, ENV.fetch("BRANCH", "modem-pay")
 set :puma_workers, 2
