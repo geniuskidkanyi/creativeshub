@@ -1,7 +1,7 @@
 lock "~> 3.20"
 
 set :application, "smartpay"
-set :repo_url, "git@github.com:geniuskidkanyi/smartpay.git"
+set :repo_url, "git@github.com:geniuskidkanyi/creativeshub.git"
 set :branch, ENV.fetch("BRANCH", "modem-pay")
 
 set :deploy_to, "/home/deploy/smartpay"
