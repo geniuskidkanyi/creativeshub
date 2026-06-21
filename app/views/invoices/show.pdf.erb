@@ -4,141 +4,334 @@
     <meta charset="utf-8">
     <title><%= @invoice.invoice_number || "Invoice" %></title>
     <style>
-      body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #1f2937; padding: 20px; }
-      .header { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: flex-start; }
-      .header h1 { font-size: 20px; margin: 0; color: #111827; }
-      .header .from p { margin: 2px 0; font-size: 12px; line-height: 1.5; }
-      .invoice-label { font-size: 14px; color: #6b7280; margin-bottom: 4px; }
-      .invoice-number { font-size: 18px; font-weight: bold; color: #111827; margin: 0; }
-      .section { margin-bottom: 20px; }
-      .section-title { font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 4px; }
-      .section-content { font-size: 12px; line-height: 1.6; margin: 2px 0; }
-      .meta { display: flex; gap: 30px; margin-bottom: 20px; }
-      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-      th { text-align: left; font-size: 10px; text-transform: uppercase; color: #6b7280; padding: 8px 0; border-bottom: 2px solid #e5e7eb; }
-      td { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
-      .text-right { text-align: right; }
-      .totals { margin-left: auto; width: 220px; }
-      .totals .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
-      .totals .total { font-weight: bold; font-size: 14px; border-top: 2px solid #e5e7eb; margin-top: 4px; padding-top: 8px; }
-      .notes { margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; }
-      .payment-link { margin-top: 30px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; }
-      .payment-link p { margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #1f2937; }
-      .payment-link a { font-size: 11px; color: #4f46e5; word-break: break-all; }
-      .footer { margin-top: 40px; font-size: 10px; color: #9ca3af; text-align: center; }
-      .logo-img { max-height: 50px; max-width: 200px; margin-bottom: 8px; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: 'DM Sans', 'Helvetica', 'Arial', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page {
+        width: 794px;
+        min-height: 1123px;
+        position: relative;
+        background: #fff;
+      }
+      .accent-bar {
+        background: #c9a84c;
+        height: 6px;
+        width: 100%;
+      }
+      .content { padding: 52px 56px 0; }
+
+      .brand-icon {
+        width: 28px; height: 28px; background: #0d0f14; border-radius: 4px;
+        display: inline-block; vertical-align: middle; text-align: center; line-height: 28px;
+        margin-right: 8px;
+      }
+      .brand-name {
+        font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 500;
+        color: #0d0f14; letter-spacing: 0.02em; vertical-align: middle;
+      }
+      .sender-info {
+        font-size: 13px; color: #444; font-weight: 500;
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        letter-spacing: 0.04em;
+      }
+      .invoice-label {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 12px; color: #555; letter-spacing: 0.12em; text-transform: uppercase;
+      }
+      .invoice-number {
+        font-family: 'Fraunces', Georgia, serif; font-size: 43px; font-weight: 500;
+        color: #0d0f14; line-height: 1;
+      }
+      .divider { height: 1px; background: #e8e4dc; margin: 36px 0; }
+
+      .meta-label {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
+      }
+      .meta-value {
+        font-size: 16px; color: #0d0f14;
+      }
+      .meta-value-mono {
+        font-size: 16px; font-family: 'Geist Mono', 'Courier New', monospace; color: #0d0f14;
+      }
+      .amount-due {
+        font-family: 'Fraunces', Georgia, serif; font-size: 34px; font-weight: 500;
+        color: #c9a84c; line-height: 1;
+      }
+      .status-pill {
+        display: inline-block;
+        font-size: 11px; font-family: 'Geist Mono', 'Courier New', monospace;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 3px 8px; border-radius: 3px; margin-top: 6px;
+      }
+      .status-dot {
+        display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+        margin-right: 4px; vertical-align: middle;
+      }
+
+      table { width: 100%; border-collapse: collapse; }
+      table.header-table { margin-bottom: 48px; }
+      table.header-table td { vertical-align: top; }
+      table.header-table td.right { text-align: right; }
+
+      table.meta-table { margin-bottom: 44px; }
+      table.meta-table td { vertical-align: top; width: 33.33%; }
+      table.meta-table td.spacer { padding-left: 40px; }
+
+      table.items-table { margin-bottom: 8px; }
+      table.items-table thead th {
+        border-top: 1px solid #e8e4dc; border-bottom: 1px solid #e8e4dc;
+        padding: 10px 0;
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
+        font-weight: normal;
+      }
+      table.items-table thead th.desc { text-align: left; }
+      table.items-table thead th.num { text-align: right; width: 80px; }
+      table.items-table thead th.rate { text-align: right; width: 100px; }
+      table.items-table thead th.amount { text-align: right; width: 100px; }
+
+      table.items-table tbody td {
+        padding: 14px 0;
+        border-bottom: 1px solid #f5f3f0;
+        vertical-align: middle;
+      }
+      table.items-table tbody tr:last-child td { border-bottom: none; }
+
+      .item-desc { font-size: 16px; color: #0d0f14; font-weight: 500; }
+      .item-mono { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 14px; color: #444; font-weight: 500; }
+      .item-mono-bold { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 16px; color: #0d0f14; font-weight: 600; }
+
+      table.totals-table { width: 240px; margin-left: auto; margin-bottom: 48px; }
+      table.totals-table td { padding: 8px 0; }
+      table.totals-table td.label {
+        font-size: 14px; color: #444; font-family: 'Geist Mono', 'Courier New', monospace;
+      }
+      table.totals-table td.val {
+        font-size: 14px; color: #333; font-family: 'Geist Mono', 'Courier New', monospace;
+        text-align: right;
+      }
+      table.totals-table tr.border td { border-bottom: 1px solid #f0ede8; }
+      table.totals-table tr.total td { padding: 12px 0 0; }
+      table.totals-table tr.total td.label {
+        font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #444;
+      }
+      table.totals-table tr.total td.val {
+        font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 500;
+        color: #c9a84c; text-align: right;
+      }
+
+      .notes-box {
+        background: #faf9f7; border: 1px solid #ede9e0; border-radius: 6px;
+        padding: 16px 20px; margin-bottom: 40px;
+      }
+      .notes-label {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .notes-text { font-size: 14px; color: #333; line-height: 1.6; font-weight: 500; }
+
+      .pay-link-box {
+        background: #faf9f7; border: 1px solid #ede9e0; border-radius: 6px;
+        padding: 14px 20px; margin-bottom: 40px; text-align: center;
+      }
+      .pay-link-label {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #444; letter-spacing: 0.1em; text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .pay-link-url {
+        font-size: 13px; color: #c9a84c; font-family: 'Geist Mono', 'Courier New', monospace;
+      }
+
+      .section-title {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
+      }
+
+      .payment-section { border-top: 1px solid #e8e4dc; padding-top: 28px; margin-bottom: 52px; }
+      table.payment-table td { width: 33.33%; padding: 0; }
+      table.payment-table td.label {
+        font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 11px; color: #555; letter-spacing: 0.1em; text-transform: uppercase;
+        padding-bottom: 4px;
+      }
+      table.payment-table td.val {
+        font-family: 'Geist Mono', 'Courier New', monospace; font-size: 14px; color: #333; font-weight: 500;
+      }
+
+      .footer {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        padding: 16px 56px; border-top: 1px solid #f0ede8;
+      }
+      table.footer-table { width: 100%; }
+      table.footer-table td { vertical-align: middle; }
+      table.footer-table td.left { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 11px; color: #555; letter-spacing: 0.1em; }
+      table.footer-table td.right { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 11px; color: #555; letter-spacing: 0.1em; text-align: right; }
+      table.footer-table td.center { text-align: center; }
+      .footer-dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #e8e4dc; margin: 0 3px; vertical-align: middle; }
+      .footer-dot.gold { background: #c9a84c; }
     </style>
   </head>
   <body>
-    <% account = @invoice.account %>
-    <div class="header">
-      <div class="from">
-        <% if account.logo.attached? %>
-          <%= image_tag base64_logo(account), class: "logo-img" %>
-        <% end %>
-        <h1><%= account.business_name %></h1>
-        <% if account.address.present? %>
-          <p><%= account.address %></p>
-        <% end %>
-        <% if account.phone.present? %>
-          <p><%= account.phone %></p>
-        <% end %>
-        <% if account.website.present? %>
-          <p><%= account.website %></p>
-        <% end %>
-        <% if account.tax_id.present? %>
-          <p style="color: #6b7280;">Tax ID: <%= account.tax_id %></p>
-        <% end %>
-      </div>
-      <div class="text-right">
-        <p class="invoice-label">INVOICE</p>
-        <h2 class="invoice-number"><%= @invoice.invoice_number || "Draft" %></h2>
-      </div>
-    </div>
+    <div class="page">
+      <div class="accent-bar"></div>
 
-    <div class="section">
-      <p class="section-title">Bill To</p>
-      <p class="section-content"><strong><%= @invoice.client.name %></strong></p>
-      <% if @invoice.client.company.present? %>
-        <p class="section-content"><%= @invoice.client.company %></p>
-      <% end %>
-      <p class="section-content"><%= @invoice.client.email %></p>
-      <% if @invoice.client.address.present? %>
-        <p class="section-content"><%= @invoice.client.address %></p>
-      <% end %>
-    </div>
+      <div class="content">
+        <% account = @invoice.account %>
 
-    <div class="meta">
-      <div>
-        <p class="section-title">Issue Date</p>
-        <p class="section-content"><%= @invoice.issue_date&.strftime("%B %d, %Y") || "—" %></p>
-      </div>
-      <div>
-        <p class="section-title">Due Date</p>
-        <p class="section-content"><%= @invoice.due_date&.strftime("%B %d, %Y") || "—" %></p>
-      </div>
-      <div>
-        <p class="section-title">Status</p>
-        <p class="section-content"><%= @invoice.status.humanize %></p>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th class="text-right">Qty</th>
-          <th class="text-right">Price</th>
-          <th class="text-right">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @invoice.invoice_items.each do |item| %>
+        <table class="header-table">
           <tr>
-            <td><%= item.description %></td>
-            <td class="text-right"><%= item.quantity %></td>
-            <td class="text-right"><%= number_to_currency(item.unit_price, unit: "D") %></td>
-            <td class="text-right"><%= number_to_currency(item.amount, unit: "D") %></td>
+            <td>
+              <div>
+                <div class="brand-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  </svg>
+                </div>
+                <span class="brand-name">SmartPay</span>
+              </div>
+              <p class="sender-info"><%= current_account.business_name %></p>
+              <% if current_account.phone.present? || current_account.website.present? %>
+                <p class="sender-info"><%= [current_account.phone, current_account.website].compact.join(" · ") %></p>
+              <% end %>
+              <% if current_account.address.present? %>
+                <p class="sender-info"><%= current_account.address %></p>
+              <% end %>
+            </td>
+            <td class="right">
+              <p class="invoice-label">Invoice</p>
+              <p class="invoice-number"><%= @invoice.invoice_number || "Draft" %></p>
+            </td>
           </tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <table class="meta-table">
+          <tr>
+            <td>
+              <p class="meta-label">Bill To</p>
+              <p class="meta-value" style="font-weight:600"><%= @invoice.client.name %></p>
+              <% if @invoice.client.company.present? %>
+                <p class="meta-value" style="color:#333;font-weight:400"><%= @invoice.client.company %></p>
+              <% end %>
+              <p class="meta-value-mono" style="color:#333"><%= @invoice.client.email %></p>
+              <% if @invoice.client.address.present? %>
+                <p class="meta-value" style="color:#333"><%= @invoice.client.address %></p>
+              <% end %>
+            </td>
+            <td class="spacer">
+              <p class="meta-label">Issue Date</p>
+              <p class="meta-value-mono"><%= @invoice.issue_date&.strftime("%b %d, %Y") || "—" %></p>
+              <p class="meta-label" style="margin-top:16px">Due Date</p>
+              <p class="meta-value-mono"><%= @invoice.due_date&.strftime("%b %d, %Y") || "—" %></p>
+            </td>
+            <td class="spacer">
+              <p class="meta-label">Amount Due</p>
+              <p class="amount-due">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></p>
+              <div class="status-pill" style="<%= status_pill_style(@invoice.status) %>">
+                <span class="status-dot" style="background:currentColor"></span>
+                <%= @invoice.status.humanize %>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th class="desc">Description</th>
+              <th class="num">Qty</th>
+              <th class="rate">Rate</th>
+              <th class="amount">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @invoice.invoice_items.each do |item| %>
+              <tr>
+                <td class="desc"><p class="item-desc"><%= item.description %></p></td>
+                <td class="num"><p class="item-mono"><%= item.quantity %></p></td>
+                <td class="rate"><p class="item-mono">D<%= number_with_precision(item.unit_price, precision: 0) %></p></td>
+                <td class="amount"><p class="item-mono-bold">D<%= number_with_precision(item.amount, precision: 0) %></p></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <table class="totals-table">
+          <tr class="border">
+            <td class="label">Subtotal</td>
+            <td class="val">D<%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></td>
+          </tr>
+          <% if @invoice.tax_rate.to_f > 0 %>
+            <tr class="border">
+              <td class="label">Tax (<%= @invoice.tax_rate %> %)</td>
+              <td class="val">D<%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></td>
+            </tr>
+          <% end %>
+          <tr class="total">
+            <td class="label">Total Due</td>
+            <td class="val">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></td>
+          </tr>
+        </table>
+
+        <% if @invoice.notes.present? %>
+          <div class="notes-box">
+            <p class="notes-label">Notes</p>
+            <p class="notes-text"><%= @invoice.notes %></p>
+          </div>
         <% end %>
-      </tbody>
-    </table>
 
-    <div class="totals">
-      <div class="row">
-        <span>Subtotal</span>
-        <span><%= number_to_currency(@invoice.subtotal || 0, unit: "D") %></span>
-      </div>
-      <% if @invoice.tax_rate.to_f > 0 %>
-        <div class="row">
-          <span>Tax (<%= @invoice.tax_rate %> %)</span>
-          <span><%= number_to_currency(@invoice.tax_amount || 0, unit: "D") %></span>
+        <% unless @invoice.paid? %>
+          <div class="pay-link-box">
+            <p class="pay-link-label">Pay Online</p>
+            <p class="pay-link-url"><%= Rails.configuration.x.public_host %>/inv/<%= @invoice.public_token %></p>
+          </div>
+        <% end %>
+
+        <div class="payment-section">
+          <p class="section-title" style="margin-bottom:14px">Payment Details</p>
+          <table class="payment-table">
+            <tr>
+              <td>
+                <p class="label">Invoice</p>
+                <p class="val"><%= @invoice.invoice_number || "Draft" %></p>
+              </td>
+              <td>
+                <p class="label">Status</p>
+                <p class="val"><%= @invoice.status.humanize %></p>
+              </td>
+              <td>
+                <p class="label">Currency</p>
+                <p class="val">GMD</p>
+              </td>
+            </tr>
+          </table>
         </div>
-      <% end %>
-      <div class="row total">
-        <span>Total</span>
-        <span><%= number_to_currency(@invoice.total_amount || 0, unit: "D") %></span>
       </div>
-    </div>
 
-    <% if @invoice.notes.present? %>
-      <div class="notes">
-        <p class="section-title">Notes</p>
-        <p class="section-content"><%= @invoice.notes %></p>
+      <div class="footer">
+        <table class="footer-table">
+          <tr>
+            <td class="left">SMARTPAY · <%= current_account.business_name&.upcase %></td>
+            <td class="center">
+              <span class="footer-dot gold"></span>
+              <span class="footer-dot"></span>
+              <span class="footer-dot"></span>
+            </td>
+            <td class="right">Thank you for your business.</td>
+          </tr>
+        </table>
       </div>
-    <% end %>
-
-    <% unless @invoice.paid? %>
-      <div class="payment-link">
-        <p>Pay Online</p>
-        <a href="<%= Rails.configuration.x.public_host %>/inv/<%= @invoice.public_token %>">
-          <%= Rails.configuration.x.public_host %>/inv/<%= @invoice.public_token %>
-        </a>
-      </div>
-    <% end %>
-
-    <div class="footer">
-      <p>Thank you for your business! — Powered by SmartPay</p>
     </div>
   </body>
 </html>

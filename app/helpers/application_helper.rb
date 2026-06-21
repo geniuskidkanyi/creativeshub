@@ -27,4 +27,14 @@ module ApplicationHelper
     mime = logo.blob.content_type
     "data:#{mime};base64,#{data}"
   end
+
+  def status_pill_style(status)
+    case status.to_s
+    when "paid" then "background:#d1fae5;color:#065f46"
+    when "sent" then "background:#fef9ec;color:#92400e"
+    when "overdue" then "background:#fee2e2;color:#991b1b"
+    when "cancelled" then "background:#f3f4f6;color:#6b7280"
+    else "background:#fef9ec;color:#92400e"
+    end
+  end
 end
