@@ -3,9 +3,7 @@ namespace :puma do
   task :start do
     on roles(:app) do
       within current_path do
-        with rails_env: fetch(:rails_env) do
-          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)}"
-        end
+        execute "cd #{current_path} && RAILS_ENV=production bundle exec puma -C config/puma.rb -b #{fetch(:puma_bind)} --daemon"
       end
     end
   end
@@ -15,7 +13,7 @@ namespace :puma do
     on roles(:app) do
       within current_path do
         if test("[ -f #{fetch(:puma_pid)} ]")
-          execute :bundle, "exec pumactl -P #{fetch(:puma_pid)} stop"
+          execute "cd #{current_path} && RAILS_ENV=production bundle exec pumactl -P #{fetch(:puma_pid)} stop"
         end
       end
     end
@@ -26,9 +24,9 @@ namespace :puma do
     on roles(:app) do
       within current_path do
         if test("[ -f #{fetch(:puma_pid)} ]") && test("kill -0 $(cat #{fetch(:puma_pid)}) 2>/dev/null")
-          execute :bundle, "exec pumactl -P #{fetch(:puma_pid)} restart"
+          execute "cd #{current_path} && RAILS_ENV=production bundle exec pumactl -P #{fetch(:puma_pid)} restart"
         else
-          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)}"
+          execute "cd #{current_path} && RAILS_ENV=production bundle exec puma -C config/puma.rb -b #{fetch(:puma_bind)} --daemon"
         end
       end
     end
@@ -39,7 +37,7 @@ namespace :puma do
     on roles(:app) do
       within current_path do
         if test("[ -f #{fetch(:puma_pid)} ]")
-          execute :bundle, "exec pumactl -P #{fetch(:puma_pid)} status"
+          execute "cd #{current_path} && bundle exec pumactl -P #{fetch(:puma_pid)} status"
         else
           info "Puma not running"
         end
