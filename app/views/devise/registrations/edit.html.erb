@@ -1,42 +1,54 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:0 16px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+  <div style="width:100%;max-width:420px">
+    <div style="text-align:center;margin-bottom:32px">
+      <h1 style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 8px">Edit Profile</h1>
+      <p style="font-size:14px;color:var(--text-muted);margin:0">Update your account details</p>
+    </div>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:28px 24px">
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Email</label>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
+          </div>
+
+          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+            <div style="font-size:13px;color:var(--text-muted)">Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+          <% end %>
+
+          <div>
+            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">New Password</label>
+            <span style="font-size:11px;color:var(--text-faint)">(leave blank if you don't want to change it)</span>
+            <%= f.password_field :password, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px" %>
+            <% if @minimum_password_length %>
+              <p style="font-size:11px;color:var(--text-faint);margin:4px 0 0"><%= @minimum_password_length %> characters minimum</p>
+            <% end %>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Confirm New Password</label>
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Current Password</label>
+            <span style="font-size:11px;color:var(--text-faint)">(we need your current password to confirm changes)</span>
+            <%= f.password_field :current_password, autocomplete: "current-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px" %>
+          </div>
+        </div>
+
+        <div style="margin-top:24px">
+          <%= f.submit "Update", style: "width:100%;height:44px;background:#c9a84c;color:#0d0f14;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+        </div>
+      <% end %>
+
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px">Unhappy?</p>
+        <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, style: "width:100%;height:44px;background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+      </div>
+    </div>
   </div>
-
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
-
-  <div class="field">
-    <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-    <% if @minimum_password_length %>
-      <p><em><%= @minimum_password_length %> characters minimum</em></p>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>

@@ -3,12 +3,21 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", as: :rails_health_check
 
-  root "dashboard#show"
+  authenticated :user do
+    root "dashboard#show", as: :authenticated_root
+  end
+
+  root "landing#show"
   get "dashboard", to: "dashboard#show", as: :dashboard
 
   resource :account, only: [ :new, :create, :edit, :update ]
 
   resources :clients do
+    collection do
+      get :search
+    end
+  end
+  resources :products do
     collection do
       get :search
     end

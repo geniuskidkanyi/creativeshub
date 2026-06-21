@@ -65,6 +65,18 @@
         </button>
       </div>
 
+      <div data-controller="product-search" data-action="product-search:add->invoice-form#addProduct" class="mb-4 relative">
+        <input type="text"
+               data-product-search-target="input"
+               data-action="input->product-search#search focus->product-search#focus"
+               placeholder="Search products & services..."
+               autocomplete="off"
+               class="w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <div data-product-search-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+          <div data-product-search-target="results"></div>
+        </div>
+      </div>
+
       <div data-invoice-form-target="items">
         <%= f.fields_for :invoice_items do |item_form| %>
           <div data-invoice-item class="grid grid-cols-12 gap-3 mb-3 items-start">

@@ -1,16 +1,29 @@
-<h2>Forgot your password?</h2>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:0 16px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+  <div style="width:100%;max-width:420px">
+    <div style="text-align:center;margin-bottom:32px">
+      <h1 style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 8px">Forgot your password?</h1>
+      <p style="font-size:14px;color:var(--text-muted);margin:0">We'll send you reset instructions</p>
+    </div>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:28px 24px">
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Email</label>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
+          </div>
+        </div>
+
+        <div style="margin-top:24px">
+          <%= f.submit "Send reset instructions", style: "width:100%;height:44px;background:#c9a84c;color:#0d0f14;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+        </div>
+      <% end %>
+
+      <div style="margin-top:16px;text-align:center;font-size:13px">
+        <%= link_to "Back to sign in", new_session_path(resource_name), style: "color:#c9a84c;text-decoration:none" %>
+      </div>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Send me password reset instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

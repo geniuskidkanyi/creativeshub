@@ -1,0 +1,42 @@
+<div class="px-6 py-6 max-w-2xl">
+  <div class="mb-6">
+    <%= link_to "← Products", products_path, class: "text-xs text-muted-foreground hover:text-foreground transition-colors" %>
+    <h1 class="text-2xl text-foreground mt-3" style="font-family: var(--font-display)">Edit Product</h1>
+  </div>
+
+  <div class="bg-card border border-border rounded-lg p-5">
+    <%= form_for @product do |f| %>
+      <% if @product.errors.any? %>
+        <div class="rounded-md bg-destructive/10 border border-destructive/30 p-4 mb-6">
+          <ul class="list-disc pl-5 space-y-1 text-sm text-destructive-foreground">
+            <% @product.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="space-y-4">
+        <div>
+          <%= f.label :name, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.text_field :name, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+
+        <div>
+          <%= f.label :description, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.text_area :description, rows: 3, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+
+        <div>
+          <%= f.label :unit_price, "Price (D)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :unit_price, step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <%= f.submit "Update Product", class: "flex-1 inline-flex justify-center px-4 py-2.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" %>
+        <%= link_to "Cancel", products_path, class: "inline-flex justify-center px-4 py-2.5 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,10 +1,16 @@
 class ApplicationController < ActionController::Base
   include Tenantable
 
+  layout :layout_by_controller
+
   before_action :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   private
+
+  def layout_by_controller
+    devise_controller? ? "landing" : "application"
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :name ])

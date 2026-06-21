@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_21_004739) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_21_042540) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -120,6 +120,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_004739) do
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
   end
 
+  create_table "products", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.decimal "unit_price"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_products_on_account_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "account_id"
     t.datetime "created_at", null: false
@@ -153,4 +163,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_004739) do
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"
   add_foreign_key "payments", "invoices"
+  add_foreign_key "products", "accounts"
 end

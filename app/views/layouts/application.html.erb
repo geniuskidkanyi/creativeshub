@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html data-controller="theme" data-theme="dark">
   <head>
     <title><%= content_for(:title) || "SmartPay" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="application-name" content="CreativesHub">
+    <meta name="application-name" content="SmartPay">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,34 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <style>
+      [data-theme="light"] {
+        --background: #fafafa;
+        --foreground: #1a1a1a;
+        --card: #ffffff;
+        --card-foreground: #1a1a1a;
+        --popover: #ffffff;
+        --popover-foreground: #1a1a1a;
+        --muted: #f0f1f3;
+        --muted-foreground: #555;
+        --border: rgba(0,0,0,0.08);
+        --input: transparent;
+        --input-background: rgba(0,0,0,0.03);
+        --secondary: #f0f1f3;
+        --secondary-foreground: #555;
+        --sidebar: #f5f5f5;
+        --sidebar-foreground: #1a1a1a;
+        --sidebar-accent: #e8e8e8;
+        --sidebar-accent-foreground: #1a1a1a;
+        --sidebar-border: rgba(0,0,0,0.06);
+        --sidebar-ring: #c9a84c;
+      }
+
+      .logo-dark { display: none !important; }
+      .logo-light { display: none !important; }
+      [data-theme="dark"] .logo-dark { display: block !important; }
+      [data-theme="light"] .logo-light { display: block !important; }
+    </style>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -30,9 +58,13 @@
             </button>
             <div class="flex items-center gap-2">
               <%= link_to root_path, class: "flex items-center gap-2.5" do %>
-                <%= image_tag "smart-pay-logo.png", alt: "SmartPay Logo", class: "w-24" %>
+                <%= image_tag "smart-pay-logo.png", alt: "SmartPay Logo", class: "logo-dark w-24" %>
+                <%= image_tag "smart-logo-light.png", alt: "SmartPay Logo", class: "logo-light w-24" %>
               <% end %>
             </div>
+            <button data-action="theme#toggle" class="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
+              <svg data-theme-target="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
           </div>
           <%= yield %>
         </main>
