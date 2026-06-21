@@ -1,13 +1,9 @@
 <aside data-sidebar-target="sidebar" class="hidden lg:flex lg:flex-col fixed lg:sticky top-0 left-0 z-50 lg:z-auto h-screen w-56 bg-sidebar border-r border-sidebar-border flex-col">
   <div class="px-5 pt-6 pb-4 flex items-center justify-between">
     <div class="flex items-center gap-2.5">
-      <div class="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
-        <svg class="w-4 h-4 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-        </svg>
-      </div>
-      <span class="text-lg text-sidebar-foreground tracking-tight" style="font-family: var(--font-display)">CreativesHub</span>
+    <%= link_to root_path, class: "flex items-center gap-2.5" do %>
+      <%= image_tag "smart-pay-logo.png", alt: "SmartPay Logo", class: "w-24" %>
+    <% end %>
     </div>
     <button type="button" data-action="sidebar#close" class="lg:hidden p-1 text-muted-foreground hover:text-sidebar-foreground transition-colors">
       <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

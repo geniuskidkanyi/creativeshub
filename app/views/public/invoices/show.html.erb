@@ -102,18 +102,11 @@
 
     <% unless @invoice.paid? %>
       <div class="text-center space-y-4">
-        <p class="text-sm text-foreground font-medium">Choose payment method</p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <%= link_to pay_public_invoice_path(@invoice.public_token, method: "payment_request"), class: "inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            Pay with Waychit
-          <% end %>
-          <%= link_to pay_public_invoice_path(@invoice.public_token, method: "payment_session"), class: "inline-flex items-center gap-2 px-8 py-3 bg-accent text-accent-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            Pay with Card
-          <% end %>
-        </div>
-        <p class="text-xs text-muted-foreground">Waychit app not required for card payments</p>
+        <%= link_to pay_public_invoice_path(@invoice.public_token), class: "inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Pay D<%= number_with_precision(@invoice.total_amount, precision: 0) %>
+        <% end %>
+        <p class="text-xs text-muted-foreground">You will be redirected to ModemPay to complete payment</p>
       </div>
     <% else %>
       <div class="text-center bg-card border border-border rounded-lg p-6">
@@ -127,6 +120,6 @@
       </div>
     <% end %>
 
-    <p class="text-center text-xs text-muted-foreground mt-8">Powered by CreativesHub</p>
+    <p class="text-center text-xs text-muted-foreground mt-8">Powered by SmartPay</p>
   </div>
 </div>

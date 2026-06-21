@@ -73,44 +73,35 @@ class InvoicesController < ApplicationController
     @invoice.save! if @invoice.changed?
 
     amount = @invoice.total_amount.to_i
-    if amount < 5
-      return redirect_to @invoice, alert: "Invoice amount must be at least D5."
+    if amount < 1
+      return redirect_to @invoice, alert: "Invoice amount must be at least D1."
     end
 
-    method = params[:method] == "payment_session" ? "payment_session" : "payment_request"
     redirect_url = "#{Rails.configuration.x.public_host}/inv/#{@invoice.public_token}"
 
     payment = @invoice.payments.create!(
       status: :pending,
       amount: @invoice.total_amount,
       currency: "GMD",
-      payment_method: method
+      payment_method: "payment_request"
     )
 
-    if method == "payment_session"
-      result = WaychitService.create_payment_session(
-        client_reference: payment.id.to_s,
-        line_items: build_line_items,
-        email: @invoice.client.email,
-        return_url: redirect_url,
-        metadata: { invoice_id: @invoice.id.to_s, invoice_number: @invoice.invoice_number }
-      )
-    else
-      result = WaychitService.create_payment_request(
-        amount: amount,
-        client_reference: payment.id.to_s,
-        description: "Invoice #{@invoice.invoice_number} - #{@invoice.client.name}",
-        success_url: redirect_url,
-        failure_url: redirect_url
-      )
-    end
+    result = ModemPayService.create_payment(
+      amount: amount,
+      currency: "GMD",
+      description: "Invoice #{@invoice.invoice_number} - #{@invoice.client.name}",
+      metadata: { payment_id: payment.id.to_s, invoice_id: @invoice.id.to_s, invoice_number: @invoice.invoice_number },
+      return_url: redirect_url,
+      cancel_url: redirect_url,
+      sub_account: current_account.modempay_sub_account_id.presence
+    )
 
     if result.success?
-      payment.update!(waychit_id: result.payment_request_id || result.payment_session_id, metadata: result.raw_response)
-      redirect_to result.launch_url, allow_other_host: true
+      payment.update!(waychit_id: result.payment_intent_id, metadata: result.raw_response)
+      redirect_to result.payment_link, allow_other_host: true
     else
       payment.destroy
-      Rails.logger.error "Waychit payment init failed: #{result.error}"
+      Rails.logger.error "ModemPay payment init failed: #{result.error}"
       redirect_to @invoice, alert: "Payment could not be initiated: #{result.error}"
     end
   rescue ActiveRecord::RecordInvalid => e
@@ -129,15 +120,5 @@ class InvoicesController < ApplicationController
       :client_id, :status, :issue_date, :due_date, :tax_rate, :notes,
       invoice_items_attributes: [ :id, :description, :quantity, :unit_price, :_destroy ]
     )
-  end
-
-  def build_line_items
-    @invoice.invoice_items.map do |item|
-      {
-        product_name: item.description,
-        quantity: [ item.quantity.to_i, 1 ].max,
-        price: item.unit_price.to_i
-      }
-    end
   end
 end

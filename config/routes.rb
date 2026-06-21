@@ -28,5 +28,5 @@ Rails.application.routes.draw do
     end
   end
 
-  post "process_waychit_payment", to: "webhooks/waychit#receive"
+  post "process_payment", to: "webhooks/modem_pay#receive"
 end

@@ -39,6 +39,6 @@ module Creativeshub
     # Don't generate system test files.
     config.generators.system_tests = nil
 
-    config.x.public_host = ENV.fetch("PUBLIC_HOST", "https://creativeshub.gm")
+    config.x.public_host = ENV.fetch("PUBLIC_HOST", "https://smartpay.gm")
   end
 end
