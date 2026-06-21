@@ -4,7 +4,7 @@ namespace :puma do
     on roles(:app) do
       within current_path do
         with rails_env: fetch(:rails_env) do
-          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)} -d"
+          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)} --daemon"
         end
       end
     end
@@ -28,7 +28,7 @@ namespace :puma do
         if test("[ -f #{fetch(:puma_pid)} ]") && test("kill -0 $(cat #{fetch(:puma_pid)}) 2>/dev/null")
           execute :bundle, "exec pumactl -P #{fetch(:puma_pid)} restart"
         else
-          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)} -d"
+          execute :bundle, "exec puma -C config/puma.rb -b #{fetch(:puma_bind)} --daemon"
         end
       end
     end
