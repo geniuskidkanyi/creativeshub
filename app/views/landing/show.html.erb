@@ -15,18 +15,18 @@ green_dark = "#b8943a"
         <%= image_tag "smart-pay-logo.png", alt: "SmartPay", class: "logo-dark h-12 w-auto" %>
         <%= image_tag "smart-logo-light.png", alt: "SmartPay", class: "logo-light h-12 w-auto" %>
       </div>
-      <div style="display:flex;gap:36px" class="hidden md:flex">
+      <div style="gap:36px" class="hidden md:flex">
         <a href="#features" style="font-size:14px;color:var(--nav-link);text-decoration:none" class="hover:text-white">Features</a>
         <a href="#payments" style="font-size:14px;color:var(--nav-link);text-decoration:none" class="hover:text-white">Payments</a>
         <a href="#pricing" style="font-size:14px;color:var(--nav-link);text-decoration:none" class="hover:text-white">Pricing</a>
         <a href="#for-who" style="font-size:14px;color:var(--nav-link);text-decoration:none" class="hover:text-white">About</a>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
-        <button data-action="theme#toggle" data-theme-target="icon" class="hidden md:flex" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--nav-link);cursor:pointer;padding:7px 10px;display:flex;align-items:center;gap:6px">
+        <button data-action="theme#toggle" data-theme-target="icon" class="hidden md:flex items-center gap-1.5" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--nav-link);cursor:pointer;padding:7px 10px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
         <%= link_to "Sign in", new_user_session_path, class: "hidden md:inline-block", style: "font-size:13px;color:var(--nav-link);text-decoration:none;padding:8px 16px" %>
-        <%= link_to new_user_registration_path, class: "hidden md:flex", style: "display:flex;align-items:center;gap:6px;background:#c9a84c;color:#0d0f14;text-decoration:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;font-family:#{body_font}" do %>
+        <%= link_to new_user_registration_path, class: "hidden md:flex items-center gap-1.5", style: "background:#c9a84c;color:#0d0f14;text-decoration:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;font-family:#{body_font}" do %>
           Get started
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         <% end %>
@@ -41,6 +41,9 @@ green_dark = "#b8943a"
         <a href="<%= href %>" data-action="landing-nav#closeMobile" style="display:block;padding:12px 0;font-size:15px;color:var(--text-dim);text-decoration:none;border-bottom:1px solid var(--border-light)"><%= label %></a>
       <% end %>
       <div style="display:flex;gap:10px;margin-top:16px">
+        <button data-action="theme#toggle" style="padding:10px;border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-size:14px;font-weight:500;font-family:<%= body_font %>;background:var(--input-bg);cursor:pointer;text-align:center">
+          <span data-theme-target="label">Light Mode</span>
+        </button>
         <%= link_to "Sign in", new_user_session_path, style: "flex:1;text-align:center;padding:10px;border:1px solid var(--border);border-radius:8px;color:var(--text-dim);text-decoration:none;font-size:14px;font-weight:500;font-family:#{body_font}" %>
         <%= link_to "Get started", new_user_registration_path, style: "flex:1;text-align:center;padding:10px;background:#c9a84c;border-radius:8px;color:#0d0f14;text-decoration:none;font-size:14px;font-weight:600;font-family:#{body_font}" %>
       </div>
@@ -94,9 +97,19 @@ green_dark = "#b8943a"
 
   <%# ─── Stats Bar ─── %>
   <div style="background:var(--bg-alt);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);font-family:<%= body_font %>">
-    <div style="max-width:1160px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(4, 1fr)">
-      <% [{value:"D2.4B+",label:"Processed in GMD"},{value:"18,000+",label:"Active businesses"},{value:"99.97%",label:"Uptime"},{value:"< 3 sec",label:"Avg. settlement"}].each_with_index do |s,i| %>
-        <div style="padding:32px 0;text-align:center;<%= 'border-right:1px solid rgba(255,255,255,0.06)' unless i == 3 %>">
+    <style>
+      .stats-grid { display:grid; grid-template-columns:repeat(2, 1fr); }
+      .stats-cell { padding:32px 0; text-align:center; }
+      .stats-cell:nth-child(odd) { border-right:1px solid var(--border-light); }
+      @media (min-width:768px) {
+        .stats-grid { grid-template-columns:repeat(4, 1fr); }
+        .stats-cell { border-right:1px solid var(--border-light); }
+        .stats-cell:last-child { border-right:none; }
+      }
+    </style>
+    <div style="max-width:1160px;margin:0 auto;padding:0 24px" class="stats-grid">
+       <% [{value:"D1.4M+",label:"Processed in GMD"},{value:"1,000+",label:"Active businesses"},{value:"99.97%",label:"Uptime"},{value:"< 3 sec",label:"Avg. settlement"}].each_with_index do |s,i| %>
+        <div class="stats-cell">
           <p style="font-family:<%= display %>;font-size:clamp(22px,3vw,32px);font-weight:700;color:#c9a84c;margin:0 0 6px;letter-spacing:-0.03em"><%= s[:value] %></p>
           <p style="font-size:13px;color:var(--text-muted);margin:0;font-family:<%= mono %>;letter-spacing:0.04em"><%= s[:label] %></p>
         </div>
@@ -113,7 +126,7 @@ green_dark = "#b8943a"
         <p style="font-size:16px;color:var(--text-muted);max-width:480px;margin:0 auto;line-height:1.7">One platform. Five channels. Zero friction — whether your customer is in Banjul or Birmingham.</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
         <% [
           {name:"Wave",color:"#1a9bdc",type:"Mobile Money",desc:"Mobile money for West Africa",letter:"W"},
           {name:"Visa",color:"#1a1f71",type:"Card",desc:"Global card network",letter:"V"},

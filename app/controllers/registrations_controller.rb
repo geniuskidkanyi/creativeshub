@@ -9,9 +9,14 @@ class RegistrationsController < Devise::RegistrationsController
       resource.save!
 
       if resource.persisted?
-        set_flash_message! :notice, :signed_up
-        sign_up(resource_name, resource)
-        respond_with resource, location: after_sign_up_path_for(resource)
+        if resource.active_for_authentication?
+          set_flash_message! :notice, :signed_up
+          sign_up(resource_name, resource)
+          respond_with resource, location: after_sign_up_path_for(resource)
+        else
+          expire_data_after_sign_in!
+          redirect_to new_user_session_path, notice: "Account created! Please check your email to confirm your account."
+        end
       else
         clean_up_passwords resource
         set_minimum_password_length

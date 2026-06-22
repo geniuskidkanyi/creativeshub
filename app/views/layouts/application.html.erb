@@ -4,6 +4,12 @@
     <title><%= content_for(:title) || "SmartPay" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="application-name" content="SmartPay">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SmartPay">
+    <meta name="theme-color" content="#0d0f14">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon.png">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,6 +51,10 @@
   </head>
 
   <body class="bg-background text-foreground" style="font-family: var(--font-body)">
+    <div data-controller="site-flash"
+         data-site-flash-notice-value="<%= flash[:notice].presence %>"
+         data-site-flash-alert-value="<%= flash[:alert].presence %>">
+    </div>
     <% if user_signed_in? && current_account.present? %>
       <div data-controller="sidebar" class="flex h-screen overflow-hidden">
         <div data-sidebar-target="backdrop" class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden" data-action="click->sidebar#close"></div>
@@ -71,16 +81,6 @@
       </div>
     <% else %>
       <main>
-        <% if flash[:notice] %>
-          <div class="fixed top-4 right-4 z-50 max-w-sm rounded-md bg-accent/20 border border-accent/30 px-4 py-3 text-sm text-foreground">
-            <%= flash[:notice] %>
-          </div>
-        <% end %>
-        <% if flash[:alert] %>
-          <div class="fixed top-4 right-4 z-50 max-w-sm rounded-md bg-destructive/20 border border-destructive/30 px-4 py-3 text-sm text-foreground">
-            <%= flash[:alert] %>
-          </div>
-        <% end %>
         <%= yield %>
       </main>
     <% end %>

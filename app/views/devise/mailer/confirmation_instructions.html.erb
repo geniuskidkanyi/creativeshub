@@ -1,5 +1,20 @@
-<p>Welcome <%= @email %>!</p>
+<div style="background:#0d0f14;padding:40px 0;font-family:'DM Sans',system-ui,sans-serif">
+  <div style="max-width:480px;margin:0 auto;background:#13161e;border:1px solid rgba(232,228,220,0.08);border-radius:12px;padding:32px;color:#e8e4dc">
+    <div style="text-align:center;margin-bottom:24px">
+      <h1 style="font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:500;color:#e8e4dc;margin:0 0 8px">SmartPay</h1>
+      <p style="font-size:14px;color:#7a7870;margin:0">Confirm your account</p>
+    </div>
 
-<p>You can confirm your account email through the link below:</p>
+    <p style="font-size:14px;color:#b8b4ac;line-height:1.6;margin:0 0 20px">Welcome to SmartPay! Click the button below to confirm your email address and activate your account.</p>
 
-<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+    <div style="text-align:center;margin:28px 0">
+      <%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token), style: "display:inline-block;background:#c9a84c;color:#0d0f14;text-decoration:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',system-ui,sans-serif" %>
+    </div>
+
+    <p style="font-size:12px;color:#7a7870;line-height:1.5;margin:0">If you didn't create an account on SmartPay, you can ignore this email.</p>
+
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(232,228,220,0.08);text-align:center">
+      <p style="font-size:11px;color:#7a7870;margin:0">SmartPay — The payment platform for Gambian businesses</p>
+    </div>
+  </div>
+</div>
