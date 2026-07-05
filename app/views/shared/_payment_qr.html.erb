@@ -1,0 +1,9 @@
+<%# Live payment QR: rotates every minute, refreshed silently in the background. %>
+<div data-controller="qr-refresh"
+     data-qr-refresh-url-value="<%= qr_code_path(format: :json) %>"
+     data-qr-refresh-seconds-remaining-value="<%= account.qr_seconds_remaining %>"
+     class="w-full max-w-[320px] mx-auto">
+  <div data-qr-refresh-target="svg" class="bg-white rounded-2xl p-4 [&_svg]:w-full [&_svg]:h-auto">
+    <%= raw payment_qr_svg(account) %>
+  </div>
+</div>

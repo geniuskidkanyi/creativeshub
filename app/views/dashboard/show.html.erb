@@ -87,7 +87,8 @@ max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
     </div>
   </div>
 
-  <div class="bg-card border border-border rounded-2xl p-[22px] mb-[18px]">
+  <div class="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-3.5 mb-[18px]">
+  <div class="bg-card border border-border rounded-2xl p-[22px]">
     <div class="flex items-center justify-between mb-4">
       <span class="text-[15px] font-bold text-foreground">Recent invoices</span>
       <%= link_to "View all →", invoices_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>
@@ -110,6 +111,16 @@ max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
     <% else %>
       <p class="text-sm text-muted-foreground pt-2">No invoices yet. <%= link_to "Create your first invoice", new_invoice_path, class: "text-primary font-semibold" %></p>
     <% end %>
+  </div>
+
+  <div class="bg-card border border-border rounded-2xl p-[22px]">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-[15px] font-bold text-foreground">Payment QR</span>
+      <%= link_to "Full screen →", qr_code_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>
+    </div>
+    <%= render "shared/payment_qr", account: current_account %>
+    <p class="text-xs text-muted-foreground text-center mt-3">Customers scan to pay you instantly.</p>
+  </div>
   </div>
 
   <% if @recent_payments.any? %>

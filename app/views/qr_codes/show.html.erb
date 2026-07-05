@@ -3,22 +3,12 @@
   <h1 class="text-[28px] text-foreground mb-1">Payment QR</h1>
   <p class="text-sm text-muted-foreground mb-6">Show this code to your customer — they scan it, enter the amount, and pay you through Modem Pay.</p>
 
-  <div class="bg-card border border-border rounded-2xl p-6"
-       data-controller="qr-refresh"
-       data-qr-refresh-url-value="<%= qr_code_path(format: :json) %>"
-       data-qr-refresh-seconds-remaining-value="<%= @seconds_remaining %>">
+  <div class="bg-card border border-border rounded-2xl p-6">
     <div class="flex flex-col items-center text-center">
       <div class="text-base font-bold text-foreground mb-1"><%= @account.business_name %></div>
       <p class="text-[13px] text-muted-foreground mb-5">Scan to pay · powered by SmartPay</p>
 
-      <div data-qr-refresh-target="svg" class="bg-white rounded-2xl p-5 w-full max-w-[320px] [&_svg]:w-full [&_svg]:h-auto">
-        <%= raw @qr_svg %>
-      </div>
-
-      <div class="flex items-center gap-2 mt-5 text-[13px] text-muted-foreground">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        Code refreshes in <span data-qr-refresh-target="countdown" class="font-mono font-semibold text-foreground"><%= @seconds_remaining %>s</span>
-      </div>
+      <%= render "shared/payment_qr", account: @account %>
     </div>
 
     <div class="mt-6 pt-5 border-t border-border">

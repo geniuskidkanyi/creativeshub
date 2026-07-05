@@ -19,6 +19,17 @@ module ApplicationHelper
     end
   end
 
+  def payment_qr_svg(account)
+    url = qr_scan_url(token: account.qr_token, c: account.current_qr_code)
+    RQRCode::QRCode.new(url).as_svg(
+      color: "141a29",
+      module_size: 5,
+      standalone: true,
+      use_path: true,
+      viewbox: true
+    )
+  end
+
   def payout_status_badge(status)
     case status.to_s
     when "completed" then "text-emerald-500 bg-emerald-500/15"
