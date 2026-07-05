@@ -12,7 +12,9 @@
     <% end %>
 
     <div class="bg-card border border-border rounded-2xl p-6">
-      <%= form_with url: qr_pay_path(token: @account.qr_token), method: :post, local: true do %>
+      <%# data-turbo=false: the redirect goes to Modem Pay's domain, which Turbo's
+          fetch cannot follow cross-origin — the browser must submit natively. %>
+      <%= form_with url: qr_pay_path(token: @account.qr_token), method: :post, data: { turbo: false } do %>
         <%= hidden_field_tag :scan_pass, @scan_pass %>
 
         <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground mb-4">Amount (GMD)
