@@ -1,7 +1,13 @@
 class ModemPayService
   BASE_URL = "https://api.modempay.com"
   API_KEY = Rails.application.credentials.modempay_api_secret!
-  WEBHOOK_SECRET = Rails.application.credentials.modempay_webhook_secret_hash!
+  # Modem Pay signs webhooks with a per-mode secret: test-mode events are
+  # signed with the test webhook secret, live events with the live one.
+  # Configure whichever apply; verification accepts a match against either.
+  WEBHOOK_SECRETS = [
+    Rails.application.credentials.modempay_webhook_secret_hash,
+    Rails.application.credentials.modempay_test_webhook_secret_hash
+  ].compact.reject { |s| s.to_s.strip.empty? }.freeze
 
   class Result
     attr_reader :success, :payload, :error
@@ -86,13 +92,13 @@ class ModemPayService
   end
 
   def verify_signature(payload:, signature:)
-    return false if signature.blank? || WEBHOOK_SECRET.blank?
+    return false if signature.blank? || WEBHOOK_SECRETS.empty?
 
-    computed = OpenSSL::HMAC.hexdigest("sha512", WEBHOOK_SECRET, payload)
-
-    return false if computed.length != signature.length
-
-    ActiveSupport::SecurityUtils.secure_compare(computed, signature)
+    WEBHOOK_SECRETS.any? do |secret|
+      computed = OpenSSL::HMAC.hexdigest("sha512", secret, payload)
+      computed.length == signature.length &&
+        ActiveSupport::SecurityUtils.secure_compare(computed, signature)
+    end
   end
 
   def self.create_sub_account(business_name:, percentage:, settlement_code:, account_number:)

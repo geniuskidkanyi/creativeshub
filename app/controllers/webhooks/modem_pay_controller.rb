@@ -43,6 +43,12 @@ module Webhooks
       raw_body = request.raw_post
 
       unless ModemPayService.verify_signature(payload: raw_body, signature: signature)
+        reason = if signature.blank?
+          "missing x-modem-signature header"
+        else
+          "signature mismatch — webhook secret doesn't match the mode (test vs live) that signed this event"
+        end
+        Rails.logger.warn("ModemPay webhook rejected (#{params[:event].inspect}): #{reason}")
         head :unauthorized
       end
     end
