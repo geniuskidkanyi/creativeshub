@@ -1,9 +1,9 @@
 module ApplicationHelper
   def status_dot(status)
     case status.to_s
-    when "paid" then "bg-accent"
-    when "sent" then "bg-blue-400"
-    when "overdue" then "bg-red-400"
+    when "paid" then "bg-emerald-500"
+    when "sent" then "bg-indigo-400"
+    when "overdue" then "bg-red-500"
     when "cancelled" then "bg-muted-foreground"
     else "bg-muted-foreground"
     end
@@ -11,10 +11,20 @@ module ApplicationHelper
 
   def status_badge(status)
     case status.to_s
-    when "paid" then "text-accent bg-accent/10"
-    when "sent" then "text-blue-300 bg-blue-950/60"
-    when "overdue" then "text-red-300 bg-red-950/60"
+    when "paid" then "text-emerald-500 bg-emerald-500/15"
+    when "sent" then "text-indigo-400 bg-indigo-400/15"
+    when "overdue" then "text-red-500 bg-red-500/15"
     when "cancelled" then "text-muted-foreground bg-muted"
+    else "text-muted-foreground bg-muted"
+    end
+  end
+
+  def payout_status_badge(status)
+    case status.to_s
+    when "completed" then "text-emerald-500 bg-emerald-500/15"
+    when "pending" then "text-amber-500 bg-amber-500/15"
+    when "failed" then "text-red-500 bg-red-500/15"
+    when "flagged" then "text-orange-500 bg-orange-500/15"
     else "text-muted-foreground bg-muted"
     end
   end

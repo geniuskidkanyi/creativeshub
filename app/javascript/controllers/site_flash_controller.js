@@ -14,7 +14,7 @@ export default class extends Controller {
 
   show(message, type) {
     const bg = type === "notice"
-      ? "background:#c9a84c;color:#0d0f14"
+      ? "background:#709afb;color:#091123"
       : "background:#c0392b;color:#fff"
 
     const toast = document.createElement("div")

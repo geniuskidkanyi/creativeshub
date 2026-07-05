@@ -1,113 +1,133 @@
-<div class="px-6 py-6">
-  <div class="mb-8">
-    <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Dashboard</h1>
-    <p class="text-sm text-muted-foreground">Welcome back, <%= current_user.name %>.</p>
+<%
+greeting = case Time.current.hour
+           when 5..11 then "Good morning"
+           when 12..16 then "Good afternoon"
+           else "Good evening"
+           end
+channel_hues = { "wave" => 155, "afrimoney" => 55, "visa" => 265, "qmoney" => 300, "aps" => 200 }
+max_month = [@monthly_revenue.values.max.to_f, 1].max
+max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
+%>
+<style>@keyframes spGrow { from { transform:scaleY(0) } to { transform:scaleY(1) } }</style>
+
+<div class="px-5 py-7 lg:px-9 lg:py-8 max-w-[1240px]">
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-7">
+    <div>
+      <h1 class="text-[28px] text-foreground"><%= greeting %>, <%= current_user.name.split.first %></h1>
+      <p class="text-sm text-muted-foreground mt-1">Here's what's happening with your money today.</p>
+    </div>
+    <%= link_to new_invoice_path, class: "px-5 py-[11px] rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all" do %>
+      + New invoice
+    <% end %>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-card border border-border rounded-lg p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs text-muted-foreground uppercase tracking-wider">Total Revenue</span>
-        <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      </div>
-      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">D<%= number_with_precision(@total_revenue, precision: 0) %></p>
-      <p class="text-xs text-primary"><%= @paid_count %> paid invoices</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3.5 mb-[18px]">
+    <div class="bg-card border border-border rounded-2xl p-[18px]">
+      <div class="text-[13px] text-muted-foreground mb-2">Total revenue</div>
+      <div class="font-display font-bold text-[26px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(@total_revenue, precision: 0)) %></div>
+      <div class="text-xs font-semibold text-primary mt-1.5"><%= @paid_count %> paid <%= "invoice".pluralize(@paid_count) %></div>
     </div>
-
-    <div class="bg-card border border-border rounded-lg p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs text-muted-foreground uppercase tracking-wider">Outstanding</span>
-        <svg class="w-4 h-4 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-      </div>
-      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">D<%= number_with_precision(@unpaid_amount, precision: 0) %></p>
-      <p class="text-xs text-destructive"><%= @overdue_count %> overdue</p>
+    <div class="bg-card border border-border rounded-2xl p-[18px]">
+      <div class="text-[13px] text-muted-foreground mb-2">Outstanding</div>
+      <div class="font-display font-bold text-[26px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(@unpaid_amount, precision: 0)) %></div>
+      <div class="text-xs font-semibold <%= @overdue_count > 0 ? 'text-red-500' : 'text-primary' %> mt-1.5"><%= @overdue_count %> overdue</div>
     </div>
-
-    <div class="bg-card border border-border rounded-lg p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs text-muted-foreground uppercase tracking-wider">Paid Invoices</span>
-        <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)"><%= @paid_count %></p>
-      <p class="text-xs text-muted-foreground">of <%= @invoice_count %> total</p>
+    <div class="bg-card border border-border rounded-2xl p-[18px]">
+      <div class="text-[13px] text-muted-foreground mb-2">Paid invoices</div>
+      <div class="font-display font-bold text-[26px] text-foreground tracking-tight"><%= @paid_count %></div>
+      <div class="text-xs font-semibold text-primary mt-1.5">of <%= @invoice_count %> total</div>
     </div>
-
-    <div class="bg-card border border-border rounded-lg p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs text-muted-foreground uppercase tracking-wider">Clients</span>
-        <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      </div>
-      <p class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)"><%= @client_count %></p>
-      <p class="text-xs text-muted-foreground">active clients</p>
+    <div class="bg-card border border-border rounded-2xl p-[18px]">
+      <div class="text-[13px] text-muted-foreground mb-2">Clients</div>
+      <div class="font-display font-bold text-[26px] text-foreground tracking-tight"><%= @client_count %></div>
+      <div class="text-xs font-semibold text-primary mt-1.5">active <%= "client".pluralize(@client_count) %></div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-card border border-border rounded-lg">
-      <div class="px-5 py-4 border-b border-border flex items-center justify-between">
-        <h3 class="text-sm text-foreground font-medium">Recent Invoices</h3>
-        <%= link_to "View all", invoices_path, class: "text-xs text-primary hover:text-primary/80 transition-colors" %>
+  <div class="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-3.5 mb-[18px]">
+    <div class="bg-card border border-border rounded-2xl p-[22px]">
+      <div class="flex items-center justify-between mb-5">
+        <span class="text-[15px] font-bold text-foreground">Revenue by month</span>
+        <span class="text-[13px] text-muted-foreground">Last 12 months</span>
       </div>
-      <div class="p-5">
-        <% if @recent_invoices.any? %>
-          <div class="space-y-3">
-            <% @recent_invoices.each do |invoice| %>
-              <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0">
-                <div class="flex items-center gap-3">
-                  <div class="w-2 h-2 rounded-full <%= status_dot(invoice.status) %>"></div>
-                  <div>
-                    <%= link_to invoice.invoice_number, invoice_path(invoice), class: "text-sm text-foreground hover:text-primary transition-colors" %>
-                    <p class="text-xs text-muted-foreground"><%= invoice.client.name %></p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm text-foreground font-medium">D<%= number_with_precision(invoice.total_amount, precision: 0) %></p>
-                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs <%= status_badge(invoice.status) %>">
-                    <span class="w-1.5 h-1.5 rounded-full <%= status_dot(invoice.status) %>"></span>
-                    <%= invoice.status.humanize %>
-                  </span>
-                </div>
-              </div>
-            <% end %>
+      <div class="flex items-end gap-2 h-[180px]">
+        <% @monthly_revenue.each_with_index do |(month, amount), idx| %>
+          <div class="flex-1 flex flex-col justify-end h-full" title="<%= month.strftime("%b %Y") %> · D<%= number_with_delimiter(number_with_precision(amount, precision: 0)) %>">
+            <div class="<%= idx.odd? ? 'bg-primary/45' : 'bg-primary' %> rounded-t-md" style="height:<%= [(amount.to_f / max_month * 100), 2].max %>%;transform-origin:bottom;animation:spGrow .5s <%= idx * 0.025 %>s ease both"></div>
           </div>
-        <% else %>
-          <p class="text-sm text-muted-foreground">No invoices yet.</p>
+        <% end %>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <% @monthly_revenue.each_key do |month| %>
+          <div class="flex-1 text-center text-[10px] text-muted-foreground"><%= month.strftime("%b") %></div>
         <% end %>
       </div>
     </div>
 
-    <div class="bg-card border border-border rounded-lg">
-      <div class="px-5 py-4 border-b border-border">
-        <h3 class="text-sm text-foreground font-medium">Recent Payments</h3>
-      </div>
-      <div class="p-5">
-        <% if @recent_payments.any? %>
-          <div class="space-y-3">
-            <% @recent_payments.each do |payment| %>
-              <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0">
-                <div>
-                  <p class="text-sm text-foreground font-medium">D<%= number_with_precision(payment.amount, precision: 0) %></p>
-                  <p class="text-xs text-muted-foreground"><%= payment.invoice.client.name %></p>
-                </div>
-                <span class="text-xs text-muted-foreground"><%= payment.paid_at&.strftime("%b %d") %></span>
+    <div class="bg-card border border-border rounded-2xl p-[22px]">
+      <span class="text-[15px] font-bold text-foreground">By channel</span>
+      <% if @channel_totals.any? %>
+        <div class="flex flex-col gap-4 mt-5">
+          <% @channel_totals.each do |method, amount| %>
+            <% hue = channel_hues[method.to_s.downcase] || 200 %>
+            <div>
+              <div class="flex justify-between text-[13px] mb-1.5">
+                <span class="text-foreground font-semibold"><%= method.presence&.titleize || "Other" %></span>
+                <span class="text-muted-foreground">D<%= number_with_delimiter(number_with_precision(amount, precision: 0)) %></span>
               </div>
-            <% end %>
-          </div>
-        <% else %>
-          <p class="text-sm text-muted-foreground">No payments yet.</p>
-        <% end %>
-      </div>
+              <div class="h-2 rounded-full bg-secondary">
+                <div class="h-full rounded-full" style="width:<%= (amount.to_f / max_channel * 100).round %>%;background:oklch(.6 .13 <%= hue %>)"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-muted-foreground mt-5">No payments yet — totals by payment channel will appear here.</p>
+      <% end %>
     </div>
   </div>
 
-  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-    <%= link_to new_invoice_path, class: "flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Create Invoice
-    <% end %>
-    <%= link_to new_client_path, class: "flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors" do %>
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-      Add Client
+  <div class="bg-card border border-border rounded-2xl p-[22px] mb-[18px]">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-[15px] font-bold text-foreground">Recent invoices</span>
+      <%= link_to "View all →", invoices_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>
+    </div>
+    <% if @recent_invoices.any? %>
+      <% @recent_invoices.each do |invoice| %>
+        <%= link_to invoice_path(invoice), class: "grid grid-cols-[1.6fr_1fr_auto] sm:grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 py-3 border-t border-border text-sm hover:bg-secondary/40 transition-colors -mx-2 px-2 rounded-lg" do %>
+          <span class="flex items-center gap-3 text-foreground font-semibold min-w-0">
+            <span class="w-[34px] h-[34px] rounded-[10px] bg-primary/15 text-primary inline-flex items-center justify-center font-bold text-sm shrink-0"><%= invoice.client.name.first.upcase %></span>
+            <span class="truncate"><%= invoice.client.name %></span>
+          </span>
+          <span class="text-muted-foreground truncate"><%= invoice.invoice_number %></span>
+          <span class="text-muted-foreground hidden sm:block"><%= invoice.due_date&.strftime("%b %d") || "—" %></span>
+          <span class="flex items-center gap-3 justify-end">
+            <span class="font-bold text-foreground">D<%= number_with_delimiter(number_with_precision(invoice.total_amount, precision: 0)) %></span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-md <%= status_badge(invoice.status) %>"><%= invoice.status.humanize %></span>
+          </span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-muted-foreground pt-2">No invoices yet. <%= link_to "Create your first invoice", new_invoice_path, class: "text-primary font-semibold" %></p>
     <% end %>
   </div>
+
+  <% if @recent_payments.any? %>
+    <div class="bg-card border border-border rounded-2xl p-[22px]">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-[15px] font-bold text-foreground">Recent payments</span>
+      </div>
+      <% @recent_payments.each do |payment| %>
+        <div class="grid grid-cols-[1.6fr_1fr_auto] sm:grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 py-3 border-t border-border text-sm">
+          <span class="flex items-center gap-3 text-foreground font-semibold min-w-0">
+            <span class="w-[34px] h-[34px] rounded-[10px] bg-emerald-500/15 text-emerald-500 inline-flex items-center justify-center font-bold text-sm shrink-0"><%= payment.payer_label.first.upcase %></span>
+            <span class="truncate"><%= payment.payer_label %></span>
+          </span>
+          <span class="text-muted-foreground truncate"><%= payment.payment_method.presence&.titleize || "—" %></span>
+          <span class="text-muted-foreground hidden sm:block"><%= payment.paid_at ? "#{time_ago_in_words(payment.paid_at)} ago" : "—" %></span>
+          <span class="font-bold text-foreground text-right">+D<%= number_with_delimiter(number_with_precision(payment.amount, precision: 0)) %></span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </div>

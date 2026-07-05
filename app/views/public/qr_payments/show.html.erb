@@ -1,0 +1,40 @@
+<% content_for(:title) { "Pay #{@account.business_name}" } %>
+<div class="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
+  <div class="w-full max-w-[420px]">
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-display font-bold text-2xl inline-flex items-center justify-center mb-3"><%= @account.business_name.first.upcase %></div>
+      <h1 class="text-[26px] text-foreground">Pay <%= @account.business_name %></h1>
+      <p class="text-sm text-muted-foreground mt-1">Secure payment via Modem Pay — Wave, Visa, Afrimoney, QMoney &amp; APS.</p>
+    </div>
+
+    <% if flash.now[:alert].present? %>
+      <div class="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 mb-4 text-sm text-red-500"><%= flash.now[:alert] %></div>
+    <% end %>
+
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <%= form_with url: qr_pay_path(token: @account.qr_token), method: :post, local: true do %>
+        <%= hidden_field_tag :scan_pass, @scan_pass %>
+
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground mb-4">Amount (GMD)
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-lg">D</span>
+            <%= number_field_tag :amount, params[:amount], step: "0.01", min: 10, required: true, placeholder: "0.00", autofocus: true,
+                  class: "w-full pl-9 pr-4 py-4 rounded-xl border border-border bg-input-background text-foreground text-[26px] font-bold tracking-tight focus:outline-none focus:ring-1 focus:ring-primary" %>
+          </div>
+        </label>
+
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground mb-5">Note <span class="font-normal text-muted-foreground">(optional)</span>
+          <%= text_field_tag :note, params[:note], maxlength: 80, placeholder: "What is this payment for?",
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+
+        <%= submit_tag "Continue to payment", class: "w-full py-3.5 rounded-xl bg-primary text-primary-foreground text-[15px] font-semibold cursor-pointer hover:brightness-110 transition-all" %>
+      <% end %>
+
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Verified scan · encrypted checkout
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="hidden lg:flex" style="background:var(--primary);color:var(--primary-ink);padding:56px;flex-direction:column;justify-content:center">
+  <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1.05;letter-spacing:-.02em;margin-bottom:20px">One dashboard for every way your customers pay.</div>
+  <p style="font-size:17px;opacity:.85;line-height:1.5">Wave, Visa, Afrimoney, QMoney and APS — settled to your wallet in seconds. Join 1,000+ Gambian businesses.</p>
+  <div style="display:flex;gap:10px;margin-top:34px;flex-wrap:wrap">
+    <% %w[W V A Q A].each do |i| %>
+      <span style="width:40px;height:40px;border-radius:11px;background:color-mix(in oklch, var(--primary-ink) 18%, transparent);display:flex;align-items:center;justify-content:center;font-weight:700"><%= i %></span>
+    <% end %>
+  </div>
+</div>

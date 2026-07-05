@@ -27,6 +27,19 @@ class ModemPayService
     def raw_response
       @payload
     end
+
+    # Transfer/payout responses may arrive flat or wrapped in "data".
+    def transfer_data
+      @payload.is_a?(Hash) && @payload["data"].is_a?(Hash) ? @payload["data"] : @payload
+    end
+
+    def transfer_id = transfer_data["id"]
+    def transfer_status = transfer_data["status"]
+    def transfer_reference = transfer_data["transfer_reference"]
+    def transfer_fee = transfer_data["fee"]
+
+    def payout_balance = @payload["payout_balance"]
+    def available_balance = @payload["available_balance"]
   end
 
   def self.create_payment(amount:, currency: "GMD", description: nil, metadata: {}, return_url: nil, cancel_url: nil, payment_methods: nil, sub_account: nil)
@@ -130,6 +143,57 @@ class ModemPayService
     parse_response(response)
   end
 
+  def self.fetch_balances
+    new.fetch_balances
+  end
+
+  def self.transfer_fee(amount:, currency: "GMD", network:)
+    new.transfer_fee(amount: amount, currency: currency, network: network)
+  end
+
+  def self.create_transfer(**kwargs)
+    new.create_transfer(**kwargs)
+  end
+
+  # GET /v1/balances → { payout_balance:, available_balance: }
+  def fetch_balances
+    response = HTTParty.get("#{BASE_URL}/v1/balances", headers: auth_headers, timeout: 30)
+    parse_plain_response(response)
+  end
+
+  # POST /v1/transfers/fees → { fee:, amount:, currency:, network: }
+  def transfer_fee(amount:, currency: "GMD", network:)
+    response = HTTParty.post(
+      "#{BASE_URL}/v1/transfers/fees",
+      headers: auth_headers,
+      body: { amount: amount, currency: currency, network: network }.to_json,
+      timeout: 30
+    )
+    parse_plain_response(response)
+  end
+
+  # POST /v1/transfers — sends a mobile money payout. The Idempotency-Key header
+  # guarantees retries of the same request never produce a second transfer.
+  def create_transfer(amount:, currency: "GMD", network:, account_number:, beneficiary_name:, idempotency_key:, narration: nil, metadata: {})
+    body = {
+      amount: amount,
+      currency: currency,
+      network: network,
+      account_number: account_number,
+      beneficiary_name: beneficiary_name
+    }
+    body[:narration] = narration if narration.present?
+    body[:metadata] = metadata.transform_values(&:to_s) if metadata.present?
+
+    response = HTTParty.post(
+      "#{BASE_URL}/v1/transfers",
+      headers: auth_headers.merge("Idempotency-Key" => idempotency_key),
+      body: body.to_json,
+      timeout: 30
+    )
+    parse_plain_response(response)
+  end
+
   private
 
   def auth_headers
@@ -138,6 +202,21 @@ class ModemPayService
       "Content-Type" => "application/json",
       "Accept" => "application/json"
     }
+  end
+
+  # Balances/fees/transfers respond without the "status"/"id" envelope that
+  # parse_response expects, so success is judged on the HTTP code alone.
+  def parse_plain_response(response)
+    if response.success?
+      Result.new(true, response.parsed_response || {})
+    else
+      Rails.logger.warn "ModemPay API error: #{response.code} #{response.message} body=#{response.body}"
+      error_msg = response.parsed_response.is_a?(Hash) && response.parsed_response["message"].presence || "HTTP #{response.code}: #{response.message}"
+      Result.new(false, response.parsed_response.is_a?(Hash) ? response.parsed_response : {}, error_msg)
+    end
+  rescue => e
+    Rails.logger.error "ModemPay API exception: #{e.class}: #{e.message}"
+    Result.new(false, {}, e.message)
   end
 
   def parse_response(response)

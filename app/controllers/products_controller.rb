@@ -15,10 +15,14 @@ class ProductsController < ApplicationController
   def create
     @product = current_account.products.new(product_params)
 
-    if @product.save
-      redirect_to products_path, notice: "Product was successfully added."
-    else
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if @product.save
+        format.html { redirect_to products_path, notice: "Product was successfully added." }
+        format.json { render json: product_json(@product), status: :created }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @product.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -46,10 +50,14 @@ class ProductsController < ApplicationController
       current_account.products.ordered.limit(10)
     end
 
-    render json: products.map { |p| { id: p.id, name: p.name, description: p.description, unit_price: p.unit_price.to_f } }
+    render json: products.map { |p| product_json(p) }
   end
 
   private
+
+  def product_json(product)
+    { id: product.id, name: product.name, description: product.description, unit_price: product.unit_price.to_f }
+  end
 
   def set_product
     @product = current_account.products.find(params[:id])

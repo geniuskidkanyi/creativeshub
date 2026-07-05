@@ -1,0 +1,21 @@
+<% content_for(:title) { "Payment status" } %>
+<div class="min-h-screen flex items-center justify-center px-4 bg-background">
+  <div class="w-full max-w-[420px] bg-card border border-border rounded-2xl p-8 text-center">
+    <% if @payment.succeeded? %>
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 text-emerald-500 inline-flex items-center justify-center text-2xl mb-4">✓</div>
+      <h1 class="text-[24px] text-foreground mb-2">Payment received</h1>
+      <p class="text-sm text-muted-foreground leading-relaxed">You paid <span class="font-bold text-foreground">D<%= number_with_delimiter(number_with_precision(@payment.amount, precision: 2)) %></span> to <%= @account.business_name %>. You can close this page.</p>
+      <% if @payment.transaction_reference.present? %>
+        <p class="text-xs text-muted-foreground font-mono mt-3">Ref: <%= @payment.transaction_reference %></p>
+      <% end %>
+    <% elsif @payment.failed? %>
+      <div class="w-14 h-14 rounded-2xl bg-red-500/15 text-red-500 inline-flex items-center justify-center text-2xl mb-4">✕</div>
+      <h1 class="text-[24px] text-foreground mb-2">Payment not completed</h1>
+      <p class="text-sm text-muted-foreground leading-relaxed">Your payment to <%= @account.business_name %> was cancelled or failed. Scan the QR code again to retry.</p>
+    <% else %>
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 inline-flex items-center justify-center text-2xl mb-4">…</div>
+      <h1 class="text-[24px] text-foreground mb-2">Payment processing</h1>
+      <p class="text-sm text-muted-foreground leading-relaxed">We're confirming your payment of <span class="font-bold text-foreground">D<%= number_with_delimiter(number_with_precision(@payment.amount, precision: 2)) %></span> to <%= @account.business_name %>. Refresh this page in a moment.</p>
+    <% end %>
+  </div>
+</div>

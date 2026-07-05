@@ -1,56 +1,55 @@
-<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:0 16px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
-  <div style="width:100%;max-width:420px">
-    <div style="text-align:center;margin-bottom:32px">
-      <%= image_tag "smart-pay-logo.png", alt: "SmartPay", class: "logo-dark", style: "height:32px;margin:0 auto 24px" %>
-      <%= image_tag "smart-logo-light.png", alt: "SmartPay", class: "logo-light", style: "height:32px;margin:0 auto 24px" %>
-      <h1 style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 8px">Create your account</h1>
-      <p style="font-size:14px;color:var(--text-muted);margin:0">Start accepting payments in minutes</p>
-    </div>
+<%
+label_style = "display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600;color:var(--text)"
+input_style = "padding:13px 15px;border:1px solid var(--border);border-radius:11px;background:var(--bg-card);color:var(--text);font-size:15px;font-family:'Hanken Grotesk',sans-serif;width:100%;box-sizing:border-box"
+%>
+<div class="grid lg:grid-cols-2" style="min-height:100vh;background:var(--bg);font-family:'Hanken Grotesk',system-ui,sans-serif;animation:spAuthIn .4s ease both">
+  <style>@keyframes spAuthIn { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }</style>
 
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:28px 24px">
+  <div style="display:flex;align-items:center;justify-content:center;padding:40px">
+    <div style="width:100%;max-width:380px">
+      <%= link_to root_path do %>
+        <%= image_tag "smart-pay-logo.png", alt: "SmartPay", class: "logo-dark", style: "height:40px;margin-bottom:28px" %>
+        <%= image_tag "smart-logo-light.png", alt: "SmartPay", class: "logo-light", style: "height:40px;margin-bottom:28px" %>
+      <% end %>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:32px;letter-spacing:-.02em;color:var(--text);margin-bottom:8px">Create your account</h1>
+      <p style="color:var(--text-muted);font-size:15px;margin-bottom:30px">Start accepting payments in 3 minutes.</p>
+
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
 
         <div style="display:flex;flex-direction:column;gap:16px">
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Your Name</label>
-            <%= f.text_field :name, autofocus: true, style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
-          </div>
-
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Email</label>
-            <%= f.email_field :email, autocomplete: "email", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
-          </div>
-
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Business Name</label>
-            <%= text_field_tag :business_name, nil, style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
-          </div>
-
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Password</label>
+          <label style="<%= label_style %>">Your name
+            <%= f.text_field :name, autofocus: true, placeholder: "Fatoumata Jallow", style: input_style %>
+          </label>
+          <label style="<%= label_style %>">Business name
+            <%= text_field_tag :business_name, nil, placeholder: "Banjul Fabrics Co.", style: input_style %>
+          </label>
+          <label style="<%= label_style %>">Email
+            <%= f.email_field :email, autocomplete: "email", placeholder: "you@business.gm", style: input_style %>
+          </label>
+          <label style="<%= label_style %>">Password
             <% if @minimum_password_length %>
-              <span style="font-size:11px;color:var(--text-faint)">(<%= @minimum_password_length %> characters minimum)</span>
+              <span style="font-size:11px;font-weight:400;color:var(--text-faint)"><%= @minimum_password_length %> characters minimum</span>
             <% end %>
-            <%= f.password_field :password, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px" %>
-          </div>
-
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Confirm Password</label>
-            <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
-          </div>
-        </div>
-
-        <div style="margin-top:24px">
-          <%= f.submit "Sign up", style: "width:100%;height:44px;background:#c9a84c;color:#0d0f14;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+            <%= f.password_field :password, autocomplete: "new-password", placeholder: "••••••••", style: input_style %>
+          </label>
+          <label style="<%= label_style %>">Confirm password
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "••••••••", style: input_style %>
+          </label>
+          <%= f.submit "Create account", style: "padding:14px;border:none;border-radius:11px;background:var(--primary);color:var(--primary-ink);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;font-family:'Hanken Grotesk',sans-serif" %>
         </div>
       <% end %>
 
-      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text-muted)">
-        <%- if controller_name != 'sessions' %>
-          <%= link_to "Log in", new_session_path(resource_name), style: "color:#c9a84c;text-decoration:none" %>
-        <% end %>
+      <div style="display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--text-muted);font-size:13px">
+        <span style="flex:1;height:1px;background:var(--border)"></span>or<span style="flex:1;height:1px;background:var(--border)"></span>
       </div>
+
+      <p style="text-align:center;font-size:14px;color:var(--text-muted)">
+        Already have an account?
+        <%= link_to "Sign in", new_session_path(resource_name), style: "color:var(--primary);font-weight:600;text-decoration:none;font-size:14px" %>
+      </p>
     </div>
   </div>
+
+  <%= render "devise/shared/auth_panel" %>
 </div>

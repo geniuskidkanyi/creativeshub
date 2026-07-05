@@ -29,6 +29,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :payouts, only: [ :index, :new, :create ]
+
+  resource :qr_code, only: [ :show ], path: "qr"
+
+  get "scan/:token", to: "public/qr_payments#show", as: :qr_scan
+  post "scan/:token", to: "public/qr_payments#create", as: :qr_pay
+  get "scan/:token/complete", to: "public/qr_payments#complete", as: :qr_complete
+
   namespace :public, path: "inv" do
     resources :invoices, only: [ :show ], param: :token, path: "" do
       member do

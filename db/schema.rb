@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_21_202354) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_05_032041) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,12 +22,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_202354) do
     t.string "logo"
     t.string "modempay_sub_account_id"
     t.string "phone"
+    t.string "qr_secret"
+    t.string "qr_token"
     t.string "settlement_account_number"
     t.string "settlement_code"
     t.string "tax_id"
     t.string "timezone"
     t.datetime "updated_at", null: false
     t.string "website"
+    t.index ["qr_token"], name: "index_accounts_on_qr_token", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -104,11 +107,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_202354) do
   end
 
   create_table "payments", force: :cascade do |t|
+    t.bigint "account_id"
     t.decimal "amount"
     t.string "client_reference"
     t.datetime "created_at", null: false
     t.string "currency"
-    t.bigint "invoice_id", null: false
+    t.bigint "invoice_id"
     t.jsonb "metadata"
     t.datetime "paid_at"
     t.string "payment_method"
@@ -117,7 +121,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_202354) do
     t.datetime "updated_at", null: false
     t.string "waychit_id"
     t.jsonb "webhook_data"
+    t.index ["account_id"], name: "index_payments_on_account_id"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+  end
+
+  create_table "payouts", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "account_number", null: false
+    t.decimal "amount", null: false
+    t.string "beneficiary_name", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "GMD", null: false
+    t.text "error_message"
+    t.decimal "fee"
+    t.string "idempotency_key", null: false
+    t.string "modempay_transfer_id"
+    t.string "narration"
+    t.string "network", null: false
+    t.string "status", default: "pending", null: false
+    t.string "transfer_reference"
+    t.datetime "updated_at", null: false
+    t.jsonb "webhook_data"
+    t.index ["account_id"], name: "index_payouts_on_account_id"
+    t.index ["idempotency_key"], name: "index_payouts_on_idempotency_key", unique: true
+    t.index ["modempay_transfer_id"], name: "index_payouts_on_modempay_transfer_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -167,6 +194,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_202354) do
   add_foreign_key "invoice_items", "invoices"
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"
+  add_foreign_key "payments", "accounts"
   add_foreign_key "payments", "invoices"
+  add_foreign_key "payouts", "accounts"
   add_foreign_key "products", "accounts"
 end

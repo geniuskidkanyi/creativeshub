@@ -1,7 +1,7 @@
-<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:0 16px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:0 16px;font-family:'Hanken Grotesk',system-ui,sans-serif">
   <div style="width:100%;max-width:420px">
     <div style="text-align:center;margin-bottom:32px">
-      <h1 style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 8px">Edit Profile</h1>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 8px">Edit Profile</h1>
       <p style="font-size:14px;color:var(--text-muted);margin:0">Update your account details</p>
     </div>
 
@@ -12,7 +12,7 @@
         <div style="display:flex;flex-direction:column;gap:16px">
           <div>
             <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Email</label>
-            <%= f.email_field :email, autofocus: true, autocomplete: "email", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Hanken Grotesk',sans-serif" %>
           </div>
 
           <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
@@ -22,7 +22,7 @@
           <div>
             <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">New Password</label>
             <span style="font-size:11px;color:var(--text-faint)">(leave blank if you don't want to change it)</span>
-            <%= f.password_field :password, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px" %>
+            <%= f.password_field :password, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Hanken Grotesk',sans-serif;margin-top:4px" %>
             <% if @minimum_password_length %>
               <p style="font-size:11px;color:var(--text-faint);margin:4px 0 0"><%= @minimum_password_length %> characters minimum</p>
             <% end %>
@@ -30,24 +30,24 @@
 
           <div>
             <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Confirm New Password</label>
-            <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif" %>
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Hanken Grotesk',sans-serif" %>
           </div>
 
           <div>
             <label style="display:block;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Current Password</label>
             <span style="font-size:11px;color:var(--text-faint)">(we need your current password to confirm changes)</span>
-            <%= f.password_field :current_password, autocomplete: "current-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px" %>
+            <%= f.password_field :current_password, autocomplete: "current-password", style: "width:100%;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);padding:0 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:'Hanken Grotesk',sans-serif;margin-top:4px" %>
           </div>
         </div>
 
         <div style="margin-top:24px">
-          <%= f.submit "Update", style: "width:100%;height:44px;background:#c9a84c;color:#0d0f14;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+          <%= f.submit "Update", style: "width:100%;height:44px;background:var(--primary);color:var(--primary-ink);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" %>
         </div>
       <% end %>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
         <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px">Unhappy?</p>
-        <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, style: "width:100%;height:44px;background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif" %>
+        <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, style: "width:100%;height:44px;background:transparent;color:#c0392b;border:1px solid #c0392b;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" %>
       </div>
     </div>
   </div>

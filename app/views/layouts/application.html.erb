@@ -7,39 +7,46 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SmartPay">
-    <meta name="theme-color" content="#0d0f14">
+    <meta name="theme-color" content="#0d111b">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon.png">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <%= yield :head %>
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <style>
       [data-theme="light"] {
-        --background: #fafafa;
-        --foreground: #1a1a1a;
+        --background: oklch(0.985 0.006 265);
+        --foreground: oklch(0.22 0.03 265);
         --card: #ffffff;
-        --card-foreground: #1a1a1a;
+        --card-foreground: oklch(0.22 0.03 265);
         --popover: #ffffff;
-        --popover-foreground: #1a1a1a;
-        --muted: #f0f1f3;
-        --muted-foreground: #555;
-        --border: rgba(0,0,0,0.08);
+        --popover-foreground: oklch(0.22 0.03 265);
+        --primary: oklch(0.5 0.16 265);
+        --primary-foreground: #ffffff;
+        --accent: oklch(0.6 0.13 25);
+        --accent-foreground: #ffffff;
+        --muted: oklch(0.96 0.012 265);
+        --muted-foreground: oklch(0.5 0.02 265);
+        --border: oklch(0.91 0.012 265);
         --input: transparent;
-        --input-background: rgba(0,0,0,0.03);
-        --secondary: #f0f1f3;
-        --secondary-foreground: #555;
-        --sidebar: #f5f5f5;
-        --sidebar-foreground: #1a1a1a;
-        --sidebar-accent: #e8e8e8;
-        --sidebar-accent-foreground: #1a1a1a;
-        --sidebar-border: rgba(0,0,0,0.06);
-        --sidebar-ring: #c9a84c;
+        --input-background: oklch(0.97 0.008 265);
+        --ring: oklch(0.5 0.16 265);
+        --secondary: oklch(0.96 0.012 265);
+        --secondary-foreground: oklch(0.5 0.02 265);
+        --sidebar: #ffffff;
+        --sidebar-foreground: oklch(0.22 0.03 265);
+        --sidebar-primary: oklch(0.5 0.16 265);
+        --sidebar-primary-foreground: #ffffff;
+        --sidebar-accent: color-mix(in oklch, oklch(0.5 0.16 265) 10%, transparent);
+        --sidebar-accent-foreground: oklch(0.5 0.16 265);
+        --sidebar-border: oklch(0.91 0.012 265);
+        --sidebar-ring: oklch(0.5 0.16 265);
       }
 
       .logo-dark { display: none !important; }

@@ -6,7 +6,7 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        font-family: 'DM Sans', 'Helvetica', 'Arial', sans-serif;
+        font-family: 'Hanken Grotesk', 'Helvetica', 'Arial', sans-serif;
         font-size: 14px;
         font-weight: 500;
         color: #1a1a1a;
@@ -20,20 +20,20 @@
         background: #fff;
       }
       .accent-bar {
-        background: #c9a84c;
+        background: #355bbd;
         height: 6px;
         width: 100%;
       }
       .content { padding: 52px 56px 0; }
 
       .brand-icon {
-        width: 28px; height: 28px; background: #0d0f14; border-radius: 4px;
+        width: 28px; height: 28px; background: #141a29; border-radius: 4px;
         display: inline-block; vertical-align: middle; text-align: center; line-height: 28px;
         margin-right: 8px;
       }
       .brand-name {
-        font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 500;
-        color: #0d0f14; letter-spacing: 0.02em; vertical-align: middle;
+        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 22px; font-weight: 500;
+        color: #141a29; letter-spacing: 0.02em; vertical-align: middle;
       }
       .sender-info {
         font-size: 13px; color: #444; font-weight: 500;
@@ -45,24 +45,24 @@
         font-size: 12px; color: #555; letter-spacing: 0.12em; text-transform: uppercase;
       }
       .invoice-number {
-        font-family: 'Fraunces', Georgia, serif; font-size: 43px; font-weight: 500;
-        color: #0d0f14; line-height: 1;
+        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 43px; font-weight: 500;
+        color: #141a29; line-height: 1;
       }
-      .divider { height: 1px; background: #e8e4dc; margin: 36px 0; }
+      .divider { height: 1px; background: #dde1ea; margin: 36px 0; }
 
       .meta-label {
         font-family: 'Geist Mono', 'Courier New', monospace;
         font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
       }
       .meta-value {
-        font-size: 16px; color: #0d0f14;
+        font-size: 16px; color: #141a29;
       }
       .meta-value-mono {
-        font-size: 16px; font-family: 'Geist Mono', 'Courier New', monospace; color: #0d0f14;
+        font-size: 16px; font-family: 'Geist Mono', 'Courier New', monospace; color: #141a29;
       }
       .amount-due {
-        font-family: 'Fraunces', Georgia, serif; font-size: 34px; font-weight: 500;
-        color: #c9a84c; line-height: 1;
+        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 34px; font-weight: 500;
+        color: #355bbd; line-height: 1;
       }
       .status-pill {
         display: inline-block;
@@ -86,7 +86,7 @@
 
       table.items-table { margin-bottom: 8px; }
       table.items-table thead th {
-        border-top: 1px solid #e8e4dc; border-bottom: 1px solid #e8e4dc;
+        border-top: 1px solid #dde1ea; border-bottom: 1px solid #dde1ea;
         padding: 10px 0;
         font-family: 'Geist Mono', 'Courier New', monospace;
         font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
@@ -104,9 +104,9 @@
       }
       table.items-table tbody tr:last-child td { border-bottom: none; }
 
-      .item-desc { font-size: 16px; color: #0d0f14; font-weight: 500; }
+      .item-desc { font-size: 16px; color: #141a29; font-weight: 500; }
       .item-mono { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 14px; color: #444; font-weight: 500; }
-      .item-mono-bold { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 16px; color: #0d0f14; font-weight: 600; }
+      .item-mono-bold { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 16px; color: #141a29; font-weight: 600; }
 
       table.totals-table { width: 240px; margin-left: auto; margin-bottom: 48px; }
       table.totals-table td { padding: 8px 0; }
@@ -123,12 +123,12 @@
         font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #444;
       }
       table.totals-table tr.total td.val {
-        font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 500;
-        color: #c9a84c; text-align: right;
+        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 26px; font-weight: 500;
+        color: #355bbd; text-align: right;
       }
 
       .notes-box {
-        background: #faf9f7; border: 1px solid #ede9e0; border-radius: 6px;
+        background: #f7f9fd; border: 1px solid #e2e7f2; border-radius: 6px;
         padding: 16px 20px; margin-bottom: 40px;
       }
       .notes-label {
@@ -139,7 +139,7 @@
       .notes-text { font-size: 14px; color: #333; line-height: 1.6; font-weight: 500; }
 
       .pay-link-box {
-        background: #faf9f7; border: 1px solid #ede9e0; border-radius: 6px;
+        background: #f7f9fd; border: 1px solid #e2e7f2; border-radius: 6px;
         padding: 14px 20px; margin-bottom: 40px; text-align: center;
       }
       .pay-link-label {
@@ -148,7 +148,7 @@
         margin-bottom: 6px;
       }
       .pay-link-url {
-        font-size: 13px; color: #c9a84c; font-family: 'Geist Mono', 'Courier New', monospace;
+        font-size: 13px; color: #355bbd; font-family: 'Geist Mono', 'Courier New', monospace;
       }
 
       .section-title {
@@ -156,7 +156,7 @@
         font-size: 11px; color: #555; letter-spacing: 0.14em; text-transform: uppercase;
       }
 
-      .payment-section { border-top: 1px solid #e8e4dc; padding-top: 28px; margin-bottom: 52px; }
+      .payment-section { border-top: 1px solid #dde1ea; padding-top: 28px; margin-bottom: 52px; }
       table.payment-table td { width: 33.33%; padding: 0; }
       table.payment-table td.label {
         font-family: 'Geist Mono', 'Courier New', monospace;
@@ -176,8 +176,8 @@
       table.footer-table td.left { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 11px; color: #555; letter-spacing: 0.1em; }
       table.footer-table td.right { font-family: 'Geist Mono', 'Courier New', monospace; font-size: 11px; color: #555; letter-spacing: 0.1em; text-align: right; }
       table.footer-table td.center { text-align: center; }
-      .footer-dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #e8e4dc; margin: 0 3px; vertical-align: middle; }
-      .footer-dot.gold { background: #c9a84c; }
+      .footer-dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #dde1ea; margin: 0 3px; vertical-align: middle; }
+      .footer-dot.gold { background: #355bbd; }
     </style>
   </head>
   <body>
@@ -192,7 +192,7 @@
             <td>
               <div>
                 <div class="brand-icon">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#355bbd" stroke-width="2" stroke-linecap="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                   </svg>

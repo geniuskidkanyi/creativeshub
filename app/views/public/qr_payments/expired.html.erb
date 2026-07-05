@@ -1,0 +1,8 @@
+<% content_for(:title) { "QR code expired" } %>
+<div class="min-h-screen flex items-center justify-center px-4 bg-background">
+  <div class="w-full max-w-[420px] bg-card border border-border rounded-2xl p-8 text-center">
+    <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 inline-flex items-center justify-center text-2xl mb-4">⏱</div>
+    <h1 class="text-[24px] text-foreground mb-2">This QR code has expired</h1>
+    <p class="text-sm text-muted-foreground leading-relaxed">For security, <%= @account.business_name %>'s payment code changes every minute. Ask them to show you their live QR code and scan it again.</p>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<% content_for(:title) { "Cash out" } %>
+<div class="px-5 py-7 lg:px-9 lg:py-8 max-w-[720px]">
+  <h1 class="text-[28px] text-foreground mb-1">Cash out</h1>
+  <p class="text-sm text-muted-foreground mb-6">Send money from your SmartPay balance to your mobile money wallet via Modem Pay.</p>
+
+  <div class="bg-card border border-border rounded-2xl p-6 mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-[13px] text-muted-foreground mb-1">Available to cash out</div>
+        <div class="font-display font-bold text-[32px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(@available_balance, precision: 2)) %></div>
+      </div>
+      <span class="w-[42px] h-[42px] rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center font-bold text-lg">D</span>
+    </div>
+  </div>
+
+  <div class="bg-card border border-border rounded-2xl p-6">
+    <div class="text-base font-bold text-foreground mb-5">Payout details</div>
+
+    <%= form_with model: @payout, url: payouts_path, method: :post do |f| %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Amount (GMD)
+          <%= f.number_field :amount, step: "0.01", min: 1, max: @available_balance, placeholder: "0.00",
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Network
+          <%= f.select :network, Payout::NETWORKS, {},
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Wallet number
+          <%= f.text_field :account_number, placeholder: "e.g. 7XXXXXX",
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Beneficiary name
+          <%= f.text_field :beneficiary_name,
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+        <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground sm:col-span-2">Note <span class="font-normal text-muted-foreground">(optional)</span>
+          <%= f.text_field :narration, placeholder: "Shown on the transfer",
+                class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </label>
+      </div>
+
+      <p class="text-xs text-muted-foreground mt-4">A network transfer fee applies and is deducted from your balance along with the amount. The fee is confirmed with Modem Pay before the transfer is sent.</p>
+
+      <div class="flex gap-2.5 mt-5">
+        <%= f.submit "Cash out", class: "px-5 py-[11px] rounded-lg bg-primary text-primary-foreground text-sm font-semibold cursor-pointer hover:brightness-110 transition-all" %>
+        <%= link_to "Cancel", payouts_path, class: "px-5 py-[11px] rounded-lg border border-border text-foreground text-sm font-semibold hover:bg-secondary/50 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

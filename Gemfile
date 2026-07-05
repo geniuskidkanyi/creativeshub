@@ -59,6 +59,9 @@ gem "httparty"
 gem "chartkick"
 gem "groupdate"
 
+# QR code generation
+gem "rqrcode"
+
 # Money handling
 gem "money-rails"
 
