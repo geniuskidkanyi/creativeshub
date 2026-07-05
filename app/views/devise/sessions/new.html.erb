@@ -14,10 +14,21 @@ input_style = "padding:13px 15px;border:1px solid var(--border);border-radius:11
       <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:32px;letter-spacing:-.02em;color:var(--text);margin-bottom:8px">Welcome back</h1>
       <p style="color:var(--text-muted);font-size:15px;margin-bottom:30px">Sign in to your SmartPay dashboard.</p>
 
+      <% if flash[:unconfirmed_email].present? %>
+        <div style="border:1px solid rgba(245,158,11,0.35);background:rgba(245,158,11,0.1);border-radius:12px;padding:14px 16px;margin-bottom:22px">
+          <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Your email isn't confirmed yet</p>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:12px">Check <span style="font-weight:600;color:var(--text)"><%= flash[:unconfirmed_email] %></span> for the confirmation link, or we can send you a new one.</p>
+          <%= form_with url: confirmation_path(resource_name), method: :post, local: true do %>
+            <%= hidden_field_tag "user[email]", flash[:unconfirmed_email] %>
+            <button type="submit" style="padding:9px 16px;border:none;border-radius:9px;background:var(--primary);color:var(--primary-ink);font-size:13px;font-weight:600;cursor:pointer;font-family:'Hanken Grotesk',sans-serif">Resend confirmation email</button>
+          <% end %>
+        </div>
+      <% end %>
+
       <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
         <div style="display:flex;flex-direction:column;gap:16px">
           <label style="<%= label_style %>">Email
-            <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@business.gm", style: input_style %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@business.gm", value: flash[:unconfirmed_email], style: input_style %>
           </label>
           <label style="<%= label_style %>">Password
             <%= f.password_field :password, autocomplete: "current-password", placeholder: "••••••••", style: input_style %>
