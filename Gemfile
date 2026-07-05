@@ -93,5 +93,4 @@ group :development do
   gem "capistrano", require: false
   gem "capistrano-rails", require: false
   gem "capistrano-rbenv", require: false
-  gem "capistrano3-puma", "~> 6.0", require: false
 end

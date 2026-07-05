@@ -25,24 +25,26 @@ set :assets_roles, [:app]
 
 # Puma via systemd
 namespace :puma do
+  # sudo -n: never prompt — if passwordless sudo isn't set up, fail loudly
+  # instead of hanging the deploy on an invisible password prompt.
   desc 'Start puma via systemd'
   task :start do
     on roles(:app) do
-      execute :sudo, :systemctl, :start, 'smartpay-puma'
+      execute :sudo, '-n', :systemctl, :start, 'smartpay-puma'
     end
   end
 
   desc 'Stop puma via systemd'
   task :stop do
     on roles(:app) do
-      execute :sudo, :systemctl, :stop, 'smartpay-puma'
+      execute :sudo, '-n', :systemctl, :stop, 'smartpay-puma'
     end
   end
 
   desc 'Restart puma via systemd'
   task :restart do
     on roles(:app) do
-      execute :sudo, :systemctl, :restart, 'smartpay-puma'
+      execute :sudo, '-n', :systemctl, :restart, 'smartpay-puma'
     end
   end
 end
