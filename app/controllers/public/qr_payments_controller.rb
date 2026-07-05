@@ -4,9 +4,9 @@ class Public::QrPaymentsController < ApplicationController
 
   before_action :set_account
 
-  # A scan pass keeps the payment form usable for a few minutes after a valid
-  # scan, even though the QR code itself rotates every minute.
-  SCAN_PASS_VALIDITY = 10.minutes
+  # A scan pass keeps the payment form usable after a valid scan, matching the
+  # in-use window a scanned QR code gets.
+  SCAN_PASS_VALIDITY = QrScan::IN_USE_WINDOW
 
   def show
     unless @account.verify_qr_code(params[:c])

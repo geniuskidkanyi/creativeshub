@@ -7,6 +7,7 @@ class Account < ApplicationRecord
   has_many :products, dependent: :destroy
   has_many :payouts, dependent: :destroy
   has_many :payments, dependent: :destroy
+  has_many :qr_scans, dependent: :destroy
 
   validates :business_name, presence: true
 
@@ -55,12 +56,22 @@ class Account < ApplicationRecord
 
     step = step_part.to_i
     current_step = Time.current.to_i / QR_STEP_SECONDS
-    return false unless step <= current_step && step >= current_step - QR_GRACE_STEPS
+    return false if step > current_step
 
     expected = qr_signature(step)
     return false if expected.length != signature.length
+    return false unless ActiveSupport::SecurityUtils.secure_compare(expected, signature)
 
-    ActiveSupport::SecurityUtils.secure_compare(expected, signature)
+    if step >= current_step - QR_GRACE_STEPS
+      # Scanned while live: mark the code in use so it survives rotation
+      # for the next QrScan::IN_USE_WINDOW.
+      register_qr_scan(step)
+      true
+    else
+      # Rotated out: only honor it if it was scanned while live and its
+      # in-use window hasn't lapsed.
+      qr_scans.in_use.exists?(step: step)
+    end
   end
 
   def qr_seconds_remaining
@@ -76,6 +87,13 @@ class Account < ApplicationRecord
 
   def qr_signature(step)
     OpenSSL::HMAC.hexdigest("sha256", qr_secret, "#{id}-#{step}")[0, 20]
+  end
+
+  def register_qr_scan(step)
+    qr_scans.where("created_at < ?", 1.day.ago).delete_all
+    # Finds the existing row on repeat scans, so the window set by the first
+    # scan stands rather than being extended by re-scanning.
+    qr_scans.create_or_find_by!(step: step)
   end
 
   def requires_modempay_sync?
