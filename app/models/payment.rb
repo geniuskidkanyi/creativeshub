@@ -21,7 +21,30 @@ class Payment < ApplicationRecord
   end
 
   def payer_label
-    invoice&.client&.name || "QR payment"
+    invoice&.client&.name || customer_name || "QR payment"
+  end
+
+  # Fields reported by the Modem Pay charge webhook, when present.
+  def channel = webhook_data&.dig("payment_method").presence
+  def payer_wallet = webhook_data&.dig("payment_account").presence
+  def customer_name = webhook_data&.dig("customer_name").presence
+  def customer_contact = webhook_data&.dig("customer_phone").presence || webhook_data&.dig("customer_email").presence
+  def test_mode? = webhook_data&.dig("test_mode") == true
+
+  def gateway_fee_paid_by
+    webhook_data&.dig("transaction_fee_type").presence
+  end
+
+  # The gateway reports money in its own scale; only translate the fee when
+  # its reported amount lines up with ours (same unit, or minor units x100).
+  def gateway_fee
+    fee = webhook_data&.dig("transaction_fee").to_d
+    return if fee.zero? || amount.to_d.zero?
+
+    case webhook_data["amount"].to_d / amount.to_d
+    when 1 then fee
+    when 100 then fee / 100
+    end
   end
 
   def mark_succeeded!(transaction_ref:, paid_at: Time.current)

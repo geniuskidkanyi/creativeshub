@@ -9,6 +9,13 @@ class Public::QrPaymentsController < ApplicationController
   SCAN_PASS_VALIDITY = QrScan::IN_USE_WINDOW
 
   def show
+    # Revisiting a scan link whose payment already succeeded shows the payment
+    # status instead of a fresh payment form (checked before code verification
+    # so it also beats the expired page). Paying again requires a new scan.
+    if (@payment = completed_scan_payment)
+      return render :complete
+    end
+
     unless @account.verify_qr_code(params[:c])
       return render :expired, status: :gone
     end
@@ -58,6 +65,9 @@ class Public::QrPaymentsController < ApplicationController
 
     if result.success?
       payment.update!(waychit_id: result.payment_intent_id, metadata: result.raw_response)
+      # Remember which code this browser paid with, so revisiting that scan
+      # link shows the payment status rather than another payment form.
+      session[:qr_payment] = { "id" => payment.id, "step" => code_step(pass["code"]) }
       redirect_to result.payment_link, allow_other_host: true
     else
       payment.destroy
@@ -89,5 +99,21 @@ class Public::QrPaymentsController < ApplicationController
 
   def payment_pass(payment)
     scan_pass_verifier.generate({ payment_id: payment.id }, expires_in: 1.hour)
+  end
+
+  # The succeeded payment this browser made against the code in the URL, if
+  # any. A re-scan produces a new code (new step), which won't match and so
+  # falls through to the normal payment form.
+  def completed_scan_payment
+    tracked = session[:qr_payment]
+    return unless tracked.is_a?(Hash) && tracked["step"].present?
+    return unless code_step(params[:c]) == tracked["step"]
+
+    @account.payments.succeeded.find_by(id: tracked["id"])
+  end
+
+  def code_step(code)
+    step = code.to_s.split("-", 2).first
+    step if step =~ /\A\d+\z/
   end
 end

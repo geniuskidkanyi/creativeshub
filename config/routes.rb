@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   end
 
   resources :payouts, only: [ :index, :new, :create ]
+  resources :payments, only: [ :show ]
 
   resource :qr_code, only: [ :show ], path: "qr"
 

@@ -1,4 +1,4 @@
-<div id="<%= dom_id(payment) %>" class="grid grid-cols-[1.6fr_1fr_auto] sm:grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 py-3 border-t border-border text-sm">
+<%= link_to payment_path(payment), id: dom_id(payment), class: "grid grid-cols-[1.6fr_1fr_auto] sm:grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 py-3 border-t border-border text-sm hover:bg-secondary/40 transition-colors -mx-2 px-2 rounded-lg" do %>
   <span class="flex items-center gap-3 text-foreground font-semibold min-w-0">
     <span class="w-[34px] h-[34px] rounded-[10px] bg-emerald-500/15 text-emerald-500 inline-flex items-center justify-center font-bold text-sm shrink-0"><%= payment.payer_label.first.upcase %></span>
     <span class="min-w-0">
@@ -15,4 +15,4 @@
   <% end %>
   <span class="text-muted-foreground hidden sm:block"><%= payment.paid_at ? "#{time_ago_in_words(payment.paid_at)} ago" : "—" %></span>
   <span class="font-bold text-foreground text-right">+D<%= number_with_delimiter(number_with_precision(payment.amount, precision: 0)) %></span>
-</div>
+<% end %>

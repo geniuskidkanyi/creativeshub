@@ -1,0 +1,93 @@
+<% content_for(:title) { "Payment details" } %>
+<div class="px-5 py-7 lg:px-9 lg:py-8 max-w-[720px]">
+  <%= link_to "← Dashboard", dashboard_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>
+  <h1 class="text-[28px] text-foreground mt-2 mb-6">Payment details</h1>
+
+  <div class="bg-card border border-border rounded-2xl p-6 mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-[13px] text-muted-foreground mb-1">Amount received</div>
+        <div class="font-display font-bold text-[32px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(@payment.amount, precision: 2)) %></div>
+      </div>
+      <span class="flex items-center gap-2">
+        <% if @payment.test_mode? %>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-md text-amber-500 bg-amber-500/15">Test</span>
+        <% end %>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-md <%= payment_status_badge(@payment.status) %>"><%= @payment.status.humanize %></span>
+      </span>
+    </div>
+  </div>
+
+  <div class="bg-card border border-border rounded-2xl p-6">
+    <div class="text-base font-bold text-foreground mb-4">Details</div>
+    <dl class="text-sm">
+      <div class="flex justify-between gap-4 py-3 border-t border-border">
+        <dt class="text-muted-foreground shrink-0">From</dt>
+        <dd class="text-foreground font-semibold text-right"><%= @payment.payer_label %></dd>
+      </div>
+      <% if @payment.note.present? %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Reason</dt>
+          <dd class="text-foreground text-right"><%= @payment.note %></dd>
+        </div>
+      <% end %>
+      <div class="flex justify-between gap-4 py-3 border-t border-border">
+        <dt class="text-muted-foreground shrink-0">Type</dt>
+        <dd class="text-foreground text-right"><%= @payment.qr_payment? ? "QR payment" : "Invoice payment" %></dd>
+      </div>
+      <% if @payment.channel %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Channel</dt>
+          <dd class="text-foreground text-right"><%= payment_channel_label(@payment.channel) %></dd>
+        </div>
+      <% end %>
+      <% if @payment.payer_wallet %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Paid from</dt>
+          <dd class="text-foreground text-right font-mono text-xs"><%= @payment.payer_wallet %></dd>
+        </div>
+      <% end %>
+      <% if @payment.customer_contact %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Customer contact</dt>
+          <dd class="text-foreground text-right"><%= @payment.customer_contact %></dd>
+        </div>
+      <% end %>
+      <% if (fee = @payment.gateway_fee) %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Transaction fee</dt>
+          <dd class="text-foreground text-right">
+            D<%= number_with_delimiter(number_with_precision(fee, precision: 2)) %>
+            <% if @payment.gateway_fee_paid_by %>
+              <span class="text-muted-foreground">(paid by <%= @payment.gateway_fee_paid_by %>)</span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+      <% if @payment.transaction_reference.present? %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Reference</dt>
+          <dd class="text-foreground text-right font-mono text-xs"><%= @payment.transaction_reference %></dd>
+        </div>
+      <% end %>
+      <% if @payment.invoice %>
+        <div class="flex justify-between gap-4 py-3 border-t border-border">
+          <dt class="text-muted-foreground shrink-0">Invoice</dt>
+          <dd class="text-right"><%= link_to @payment.invoice.invoice_number, invoice_path(@payment.invoice), class: "text-primary font-semibold hover:brightness-110" %></dd>
+        </div>
+      <% end %>
+      <div class="flex justify-between gap-4 py-3 border-t border-border">
+        <dt class="text-muted-foreground shrink-0">Paid at</dt>
+        <dd class="text-foreground text-right"><%= @payment.paid_at ? @payment.paid_at.strftime("%b %d, %Y · %H:%M") : "—" %></dd>
+      </div>
+      <div class="flex justify-between gap-4 py-3 border-t border-border">
+        <dt class="text-muted-foreground shrink-0">Started</dt>
+        <dd class="text-foreground text-right"><%= @payment.created_at.strftime("%b %d, %Y · %H:%M") %></dd>
+      </div>
+      <div class="flex justify-between gap-4 py-3 border-t border-border">
+        <dt class="text-muted-foreground shrink-0">Currency</dt>
+        <dd class="text-foreground text-right"><%= @payment.currency.presence || "GMD" %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

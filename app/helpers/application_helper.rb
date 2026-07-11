@@ -30,6 +30,19 @@ module ApplicationHelper
     )
   end
 
+  def payment_channel_label(channel)
+    { "aps" => "APS", "qmoney" => "QMoney" }.fetch(channel.to_s.downcase, channel.to_s.titleize)
+  end
+
+  def payment_status_badge(status)
+    case status.to_s
+    when "succeeded" then "text-emerald-500 bg-emerald-500/15"
+    when "pending" then "text-amber-500 bg-amber-500/15"
+    when "failed" then "text-red-500 bg-red-500/15"
+    else "text-muted-foreground bg-muted"
+    end
+  end
+
   def payout_status_badge(status)
     case status.to_s
     when "completed" then "text-emerald-500 bg-emerald-500/15"
