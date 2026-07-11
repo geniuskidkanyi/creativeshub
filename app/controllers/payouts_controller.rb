@@ -3,7 +3,6 @@ class PayoutsController < ApplicationController
 
   def index
     @payouts = current_account.payouts.ordered
-    @available_balance = current_account.available_payout_balance
   end
 
   def new

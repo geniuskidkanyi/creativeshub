@@ -25,6 +25,10 @@ class Public::QrPaymentsController < ApplicationController
       return render :expired, status: :gone
     end
 
+    # Starting a payment counts as using the code: extend its in-use window so
+    # it is still honored when the customer comes back from Modem Pay.
+    @account.verify_qr_code(pass["code"])
+
     amount = params[:amount].to_d
     if amount < 10
       flash.now[:alert] = "Please enter an amount of at least D10."
@@ -36,7 +40,8 @@ class Public::QrPaymentsController < ApplicationController
       status: :pending,
       amount: amount,
       currency: "GMD",
-      payment_method: "payment_session"
+      payment_method: "payment_session",
+      note: params[:note].to_s.strip.first(80).presence
     )
 
     return_url = "#{Rails.configuration.x.public_host}/scan/#{@account.qr_token}/complete?p=#{payment_pass(payment)}"
@@ -44,7 +49,7 @@ class Public::QrPaymentsController < ApplicationController
     result = ModemPayService.create_payment(
       amount: amount.to_i,
       currency: "GMD",
-      description: "Payment to #{@account.business_name}#{params[:note].present? ? " — #{params[:note].to_s.first(80)}" : ""}",
+      description: "Payment to #{@account.business_name}#{payment.note ? " — #{payment.note}" : ""}",
       metadata: { payment_id: payment.id.to_s, account_id: @account.id.to_s, qr: "true" },
       return_url: return_url,
       cancel_url: return_url,
@@ -64,7 +69,10 @@ class Public::QrPaymentsController < ApplicationController
   end
 
   def complete
-    payment_id = scan_pass_verifier.verified(params[:p])&.fetch("payment_id", nil)
+    # Some gateways append their own query string to the return_url with a
+    # bare "?", which lands inside the p param — keep only the pass itself.
+    pass = params[:p].to_s.split(/[?&]/).first
+    payment_id = scan_pass_verifier.verified(pass)&.fetch("payment_id", nil)
     @payment = payment_id && @account.payments.find_by(id: payment_id)
     return redirect_to qr_scan_path(token: @account.qr_token) unless @payment
   end

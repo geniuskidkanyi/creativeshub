@@ -13,7 +13,17 @@ class Payout < ApplicationRecord
   # Failed payouts never left the wallet, so they don't count against the balance.
   scope :counted_against_balance, -> { where.not(status: :failed) }
 
+  # Any payout change can move the available balance (new payout, fee set,
+  # failed payouts stop counting), so refresh the live balance cards.
+  after_commit :broadcast_balance_refresh, on: [ :create, :update ]
+
   def total_debit
     amount + (fee || 0)
+  end
+
+  private
+
+  def broadcast_balance_refresh
+    account.broadcast_balance_refresh
   end
 end

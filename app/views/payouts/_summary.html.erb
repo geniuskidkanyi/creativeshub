@@ -1,0 +1,14 @@
+<div id="payout_summary" class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-[18px]">
+  <div class="bg-card border border-border rounded-2xl p-[18px]">
+    <div class="text-[13px] text-muted-foreground mb-2">Available balance</div>
+    <div class="font-display font-bold text-[24px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(account.available_payout_balance, precision: 2)) %></div>
+  </div>
+  <div class="bg-card border border-border rounded-2xl p-[18px]">
+    <div class="text-[13px] text-muted-foreground mb-2">Total earned</div>
+    <div class="font-display font-bold text-[24px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(account.total_earnings, precision: 2)) %></div>
+  </div>
+  <div class="bg-card border border-border rounded-2xl p-[18px]">
+    <div class="text-[13px] text-muted-foreground mb-2">Total paid out</div>
+    <div class="font-display font-bold text-[24px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(account.total_paid_out, precision: 2)) %></div>
+  </div>
+</div>

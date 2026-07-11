@@ -43,6 +43,27 @@ class Account < ApplicationRecord
     [ total_earnings - total_paid_out, 0 ].max
   end
 
+  # Live figures: dashboard and payout pages subscribe with
+  # turbo_stream_from(account); these push refreshed partials over Action
+  # Cable whenever money moves. Targets missing from the open page are
+  # silently ignored by Turbo.
+  def broadcast_revenue_refresh
+    broadcast_replace_to self, target: "recent_payments", partial: "dashboard/recent_payments", locals: { account: self }
+    broadcast_balance_refresh
+  end
+
+  # Slots a newly succeeded payment on top of the visible list, leaving the
+  # existing rows in place. The row's dom_id keeps re-deliveries idempotent.
+  def broadcast_new_payment(payment)
+    broadcast_prepend_to self, target: "recent_payments_list", partial: "dashboard/payment", locals: { payment: payment }
+    broadcast_balance_refresh
+  end
+
+  def broadcast_balance_refresh
+    broadcast_replace_to self, target: "payout_summary", partial: "payouts/summary", locals: { account: self }
+    broadcast_replace_to self, target: "payout_available_balance", partial: "payouts/available_balance", locals: { account: self }
+  end
+
   def current_qr_code(at: Time.current)
     step = at.to_i / QR_STEP_SECONDS
     "#{step}-#{qr_signature(step)}"
@@ -69,8 +90,13 @@ class Account < ApplicationRecord
       true
     else
       # Rotated out: only honor it if it was scanned while live and its
-      # in-use window hasn't lapsed.
-      qr_scans.in_use.exists?(step: step)
+      # in-use window hasn't lapsed. Each use pushes the window out another
+      # IN_USE_WINDOW so an in-progress checkout keeps the code alive.
+      scan = qr_scans.in_use.find_by(step: step)
+      return false unless scan
+
+      scan.touch
+      true
     end
   end
 
@@ -91,9 +117,10 @@ class Account < ApplicationRecord
 
   def register_qr_scan(step)
     qr_scans.where("created_at < ?", 1.day.ago).delete_all
-    # Finds the existing row on repeat scans, so the window set by the first
-    # scan stands rather than being extended by re-scanning.
-    qr_scans.create_or_find_by!(step: step)
+    scan = qr_scans.create_or_find_by!(step: step)
+    # Repeat scans extend the in-use window to IN_USE_WINDOW from now.
+    scan.touch unless scan.previously_new_record?
+    scan
   end
 
   def requires_modempay_sync?

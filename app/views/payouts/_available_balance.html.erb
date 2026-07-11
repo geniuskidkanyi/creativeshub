@@ -1,0 +1,9 @@
+<div id="payout_available_balance" class="bg-card border border-border rounded-2xl p-6 mb-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="text-[13px] text-muted-foreground mb-1">Available to cash out</div>
+      <div class="font-display font-bold text-[32px] text-foreground tracking-tight">D<%= number_with_delimiter(number_with_precision(account.available_payout_balance, precision: 2)) %></div>
+    </div>
+    <span class="w-[42px] h-[42px] rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center font-bold text-lg">D</span>
+  </div>
+</div>

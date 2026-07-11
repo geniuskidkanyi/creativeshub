@@ -11,6 +11,11 @@ class Payment < ApplicationRecord
 
   scope :succeeded, -> { where(status: :succeeded) }
 
+  # Succeeded payments drive the dashboard list and the payout balance, so
+  # entering or leaving that state refreshes both live.
+  after_commit :broadcast_account_refresh,
+               if: -> { saved_change_to_status? && (succeeded? || status_previously_was == "succeeded") }
+
   def qr_payment?
     invoice_id.nil?
   end
@@ -29,5 +34,20 @@ class Payment < ApplicationRecord
 
   def mark_failed!
     update!(status: :failed)
+  end
+
+  private
+
+  def broadcast_account_refresh
+    return unless account
+
+    if succeeded? && account.payments.succeeded.where.not(id: id).exists?
+      # The list is already on screen: keep its rows and slot this one in.
+      account.broadcast_new_payment(self)
+    else
+      # First payment (the card itself must appear) or a payment leaving
+      # succeeded: redraw the whole section.
+      account.broadcast_revenue_refresh
+    end
   end
 end

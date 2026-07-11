@@ -1,0 +1,18 @@
+<div id="<%= dom_id(payment) %>" class="grid grid-cols-[1.6fr_1fr_auto] sm:grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 py-3 border-t border-border text-sm">
+  <span class="flex items-center gap-3 text-foreground font-semibold min-w-0">
+    <span class="w-[34px] h-[34px] rounded-[10px] bg-emerald-500/15 text-emerald-500 inline-flex items-center justify-center font-bold text-sm shrink-0"><%= payment.payer_label.first.upcase %></span>
+    <span class="min-w-0">
+      <span class="block truncate"><%= payment.payer_label %></span>
+      <% if payment.qr_payment? && payment.note.present? %>
+        <span class="block truncate text-xs font-normal text-muted-foreground"><%= payment.note %></span>
+      <% end %>
+    </span>
+  </span>
+  <% if payment.qr_payment? %>
+    <span class="text-muted-foreground truncate font-mono text-xs" title="<%= payment.transaction_reference %>">Ref: <%= payment.transaction_reference.presence || "—" %></span>
+  <% else %>
+    <span class="text-muted-foreground truncate"><%= payment.payment_method.presence&.titleize || "—" %></span>
+  <% end %>
+  <span class="text-muted-foreground hidden sm:block"><%= payment.paid_at ? "#{time_ago_in_words(payment.paid_at)} ago" : "—" %></span>
+  <span class="font-bold text-foreground text-right">+D<%= number_with_delimiter(number_with_precision(payment.amount, precision: 0)) %></span>
+</div>

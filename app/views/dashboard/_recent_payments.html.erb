@@ -1,0 +1,13 @@
+<div id="recent_payments">
+  <% payments = account.payments.succeeded.order(paid_at: :desc).limit(5) %>
+  <% if payments.any? %>
+    <div class="bg-card border border-border rounded-2xl p-[22px]">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-[15px] font-bold text-foreground">Recent payments</span>
+      </div>
+      <div id="recent_payments_list">
+        <%= render partial: "dashboard/payment", collection: payments %>
+      </div>
+    </div>
+  <% end %>
+</div>
