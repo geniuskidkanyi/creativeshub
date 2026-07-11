@@ -150,6 +150,12 @@
       .pay-link-url {
         font-size: 13px; color: #355bbd; font-family: 'Geist Mono', 'Courier New', monospace;
       }
+      .pay-qr { margin: 10px auto 8px; }
+      .pay-qr svg { background: #fff; }
+      .pay-link-hint {
+        font-size: 11px; color: #555; font-family: 'Geist Mono', 'Courier New', monospace;
+        letter-spacing: 0.06em; margin-top: 6px;
+      }
 
       .section-title {
         font-family: 'Geist Mono', 'Courier New', monospace;
@@ -294,7 +300,9 @@
         <% unless @invoice.paid? %>
           <div class="pay-link-box">
             <p class="pay-link-label">Pay Online</p>
-            <p class="pay-link-url"><%= Rails.configuration.x.public_host %>/inv/<%= @invoice.public_token %></p>
+            <div class="pay-qr"><%= raw invoice_qr_svg(@invoice) %></div>
+            <p class="pay-link-url"><%= invoice_public_link(@invoice) %></p>
+            <p class="pay-link-hint">Scan the code with your phone camera to view and pay this invoice.</p>
           </div>
         <% end %>
 

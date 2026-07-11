@@ -30,6 +30,22 @@ module ApplicationHelper
     )
   end
 
+  def invoice_public_link(invoice)
+    "#{Rails.configuration.x.public_host}/inv/#{invoice.public_token}"
+  end
+
+  # QR encoding the invoice's public payment page. Fixed module size (no
+  # viewbox) so the SVG carries explicit dimensions — wkhtmltopdf's WebKit
+  # needs those to size it in the PDF.
+  def invoice_qr_svg(invoice, module_size: 3)
+    RQRCode::QRCode.new(invoice_public_link(invoice)).as_svg(
+      color: "141a29",
+      module_size: module_size,
+      standalone: true,
+      use_path: true
+    )
+  end
+
   def payment_channel_label(channel)
     { "aps" => "APS", "qmoney" => "QMoney" }.fetch(channel.to_s.downcase, channel.to_s.titleize)
   end

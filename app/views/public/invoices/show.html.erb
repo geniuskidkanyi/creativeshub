@@ -107,6 +107,13 @@
           Pay D<%= number_with_precision(@invoice.total_amount, precision: 0) %>
         <% end %>
         <p class="text-xs text-muted-foreground">You will be redirected to ModemPay to complete payment</p>
+
+        <div class="pt-2">
+          <p class="text-xs text-muted-foreground uppercase tracking-wider mb-3">Or scan to pay from your phone</p>
+          <div class="inline-block bg-white rounded-xl p-3 border border-border">
+            <%= raw invoice_qr_svg(@invoice, module_size: 4) %>
+          </div>
+        </div>
       </div>
     <% else %>
       <div class="text-center bg-card border border-border rounded-lg p-6">

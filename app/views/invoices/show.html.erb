@@ -125,6 +125,18 @@
     <% end %>
   </div>
 
+  <% unless @invoice.paid? %>
+    <div class="bg-card border border-border rounded-lg p-5 mt-4 flex items-center gap-5">
+      <div class="bg-white rounded-xl p-2.5 shrink-0">
+        <%= raw invoice_qr_svg(@invoice, module_size: 3) %>
+      </div>
+      <div>
+        <h3 class="text-sm text-foreground font-medium">Scan to pay</h3>
+        <p class="text-xs text-muted-foreground mt-1">Your customer can scan this code with their phone to open and pay this invoice — the same link as Copy Link.</p>
+      </div>
+    </div>
+  <% end %>
+
   <% if @invoice.payments.succeeded.any? %>
     <div class="bg-card border border-border rounded-lg p-5 mt-4">
       <h3 class="text-sm text-foreground font-medium mb-3">Payment History</h3>
