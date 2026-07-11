@@ -6,9 +6,11 @@ export default class extends Controller {
   connect() {
     this.handleScroll = () => {
       if (window.scrollY > 40) {
-        this.navTarget.style.background = "rgba(6,8,12,0.92)"
+        // Theme-aware: --nav-bg/--nav-border flip with data-theme, so the
+        // scrolled bar stays light in light mode and dark in dark mode.
+        this.navTarget.style.background = "var(--nav-bg)"
         this.navTarget.style.backdropFilter = "blur(16px)"
-        this.navTarget.style.borderBottom = "1px solid rgba(255,255,255,0.06)"
+        this.navTarget.style.borderBottom = "1px solid var(--nav-border)"
       } else {
         this.navTarget.style.background = "transparent"
         this.navTarget.style.backdropFilter = "none"
