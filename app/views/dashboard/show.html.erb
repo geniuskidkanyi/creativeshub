@@ -22,6 +22,17 @@ max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
     <% end %>
   </div>
 
+  <%# Mobile: the payment QR sits right under the header; on desktop it lives
+      beside the recent invoices further down. %>
+  <div class="lg:hidden bg-card border border-border rounded-2xl p-[22px] mb-[18px]">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-[15px] font-bold text-foreground">Payment QR</span>
+      <%= link_to "Full screen →", qr_code_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>
+    </div>
+    <%= render "shared/payment_qr", account: current_account %>
+    <p class="text-xs text-muted-foreground text-center mt-3">Customers scan to pay you instantly.</p>
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3.5 mb-[18px]">
     <div class="bg-card border border-border rounded-2xl p-[18px]">
       <div class="text-[13px] text-muted-foreground mb-2">Total revenue</div>
@@ -114,7 +125,7 @@ max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
     <% end %>
   </div>
 
-  <div class="bg-card border border-border rounded-2xl p-[22px]">
+  <div class="hidden lg:block bg-card border border-border rounded-2xl p-[22px]">
     <div class="flex items-center justify-between mb-4">
       <span class="text-[15px] font-bold text-foreground">Payment QR</span>
       <%= link_to "Full screen →", qr_code_path, class: "text-[13px] font-semibold text-primary hover:brightness-110" %>

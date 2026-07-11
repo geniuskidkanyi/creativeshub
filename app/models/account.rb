@@ -48,20 +48,20 @@ class Account < ApplicationRecord
   # Cable whenever money moves. Targets missing from the open page are
   # silently ignored by Turbo.
   def broadcast_revenue_refresh
-    broadcast_replace_to self, target: "recent_payments", partial: "dashboard/recent_payments", locals: { account: self }
+    safe_broadcast { broadcast_replace_to self, target: "recent_payments", partial: "dashboard/recent_payments", locals: { account: self } }
     broadcast_balance_refresh
   end
 
   # Slots a newly succeeded payment on top of the visible list, leaving the
   # existing rows in place. The row's dom_id keeps re-deliveries idempotent.
   def broadcast_new_payment(payment)
-    broadcast_prepend_to self, target: "recent_payments_list", partial: "dashboard/payment", locals: { payment: payment }
+    safe_broadcast { broadcast_prepend_to self, target: "recent_payments_list", partial: "dashboard/payment", locals: { payment: payment } }
     broadcast_balance_refresh
   end
 
   def broadcast_balance_refresh
-    broadcast_replace_to self, target: "payout_summary", partial: "payouts/summary", locals: { account: self }
-    broadcast_replace_to self, target: "payout_available_balance", partial: "payouts/available_balance", locals: { account: self }
+    safe_broadcast { broadcast_replace_to self, target: "payout_summary", partial: "payouts/summary", locals: { account: self } }
+    safe_broadcast { broadcast_replace_to self, target: "payout_available_balance", partial: "payouts/available_balance", locals: { account: self } }
   end
 
   def current_qr_code(at: Time.current)
@@ -110,6 +110,14 @@ class Account < ApplicationRecord
   end
 
   private
+
+  # A live-update failure must never break payment processing or stop the
+  # remaining broadcasts, but it must be loud in the logs.
+  def safe_broadcast
+    yield
+  rescue => e
+    Rails.logger.error "Live update broadcast failed for account #{id}: #{e.class}: #{e.message}"
+  end
 
   def qr_signature(step)
     OpenSSL::HMAC.hexdigest("sha256", qr_secret, "#{id}-#{step}")[0, 20]

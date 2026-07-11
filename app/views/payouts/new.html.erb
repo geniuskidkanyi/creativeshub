@@ -12,7 +12,10 @@
     <%= form_with model: @payout, url: payouts_path, method: :post do |f| %>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Amount (GMD)
-          <%= f.number_field :amount, step: "0.01", min: 1, max: @available_balance, placeholder: "0.00",
+          <%# No max here: the balance card updates live over the websocket and a
+              page-load max would wrongly block amounts the balance now covers.
+              The server re-checks against the current balance on submit. %>
+          <%= f.number_field :amount, step: "0.01", min: 1, placeholder: "0.00",
                 class: "px-3.5 py-3 rounded-lg border border-border bg-input-background text-foreground text-[15px] font-normal focus:outline-none focus:ring-1 focus:ring-primary" %>
         </label>
         <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-foreground">Network
