@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_11_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_11_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,9 +101,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_11_000001) do
     t.decimal "tax_rate"
     t.decimal "total_amount"
     t.datetime "updated_at", null: false
+    t.uuid "uuid", null: false
     t.index ["account_id"], name: "index_invoices_on_account_id"
     t.index ["client_id"], name: "index_invoices_on_client_id"
     t.index ["public_token"], name: "index_invoices_on_public_token", unique: true
+    t.index ["uuid"], name: "index_invoices_on_uuid", unique: true
   end
 
   create_table "payments", force: :cascade do |t|

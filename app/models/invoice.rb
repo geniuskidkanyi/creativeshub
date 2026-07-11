@@ -13,10 +13,16 @@ class Invoice < ApplicationRecord
 
   before_create :generate_invoice_number
   before_create :generate_public_token
+  before_create :generate_uuid
   before_save :calculate_totals
 
   scope :ordered, -> { order(created_at: :desc) }
   scope :for_account, ->(account) { where(account: account) }
+
+  # Invoice URLs use the UUID rather than the sequential id.
+  def to_param
+    uuid
+  end
 
   def mark_as_sent!
     update!(status: :sent)
@@ -49,5 +55,9 @@ class Invoice < ApplicationRecord
   def generate_public_token
     return if public_token.present?
     self.public_token = SecureRandom.urlsafe_base64(16)
+  end
+
+  def generate_uuid
+    self.uuid ||= SecureRandom.uuid
   end
 end

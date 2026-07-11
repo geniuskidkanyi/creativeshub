@@ -112,7 +112,7 @@ class InvoicesController < ApplicationController
   private
 
   def set_invoice
-    @invoice = current_account.invoices.find(params[:id])
+    @invoice = current_account.invoices.find_by!(uuid: params[:id])
   end
 
   def invoice_params
