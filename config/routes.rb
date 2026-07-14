@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { registrations: "registrations", sessions: "users/sessions" }
 
+  # Platform admin (Avo): only users with the platform_admin flag get in;
+  # everyone else is bounced to sign-in without learning the panel exists.
+  # NOTE: this must be platform_admin?, not admin? — the role enum's "admin"
+  # value defines admin? as account-level admin.
+  authenticate :user, ->(user) { user.platform_admin? } do
+    mount_avo
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   authenticated :user do
