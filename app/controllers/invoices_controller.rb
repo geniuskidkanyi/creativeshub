@@ -19,13 +19,15 @@ class InvoicesController < ApplicationController
   end
 
   def new
-    @invoice = current_account.invoices.new(status: :draft)
+    @invoice = current_account.invoices.new(status: :sent)
     @invoice.invoice_items.build
     @clients = current_account.clients.ordered
   end
 
   def create
     @invoice = current_account.invoices.new(invoice_params)
+    # A generated invoice is immediately live ("sent") — no draft stage.
+    @invoice.status = :sent
     @invoice.issue_date ||= Date.current
 
     if @invoice.save

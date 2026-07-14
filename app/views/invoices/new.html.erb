@@ -37,10 +37,6 @@
             </div>
           </div>
         </div>
-        <div>
-          <%= f.label :status, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
-          <%= f.select :status, Invoice.statuses.keys.map { |s| [ s.humanize, s ] }, {}, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
-        </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>

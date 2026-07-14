@@ -24,7 +24,7 @@
         height: 6px;
         width: 100%;
       }
-      .content { padding: 52px 56px 0; }
+      .content { padding: 52px 0px 0; }
 
       .brand-icon {
         width: 28px; height: 28px; background: #141a29; border-radius: 4px;
@@ -39,13 +39,15 @@
         font-size: 13px; color: #444; font-weight: 500;
         font-family: 'Geist Mono', 'Courier New', monospace;
         letter-spacing: 0.04em;
+        padding-top: 15px;
       }
+      .sender-logo img { height: 70px; width: auto; vertical-align: middle; }
       .invoice-label {
         font-family: 'Geist Mono', 'Courier New', monospace;
         font-size: 12px; color: #555; letter-spacing: 0.12em; text-transform: uppercase;
       }
       .invoice-number {
-        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 43px; font-weight: 500;
+        font-family: 'Bricolage Grotesque', Georgia, sans-serif; font-size: 28px; font-weight: 500;
         color: #141a29; line-height: 1;
       }
       .divider { height: 1px; background: #dde1ea; margin: 36px 0; }
@@ -197,13 +199,14 @@
           <tr>
             <td>
               <div>
-                <div class="brand-icon">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#355bbd" stroke-width="2" stroke-linecap="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                  </svg>
-                </div>
-                <span class="brand-name">SmartPay</span>
+                <%# Images inlined as base64: Active Storage URLs aren't
+                    generatable here and wkhtmltopdf couldn't fetch them anyway. %>
+                <%= image_tag(asset_data_uri("smart-pay-logo.png"), alt: "SmartPay", style: "height: 30px; width: auto; vertical-align: middle;") %>
+                <% if current_account.logo.attached? %>
+                  <span class="sender-logo" style="margin-left: 12px; padding-left: 14px; border-left: 1px solid #dde1ea;">
+                    <%= image_tag base64_logo(current_account), alt: current_account.business_name %>
+                  </span>
+                <% end %>
               </div>
               <p class="sender-info"><%= current_account.business_name %></p>
               <% if current_account.phone.present? || current_account.website.present? %>

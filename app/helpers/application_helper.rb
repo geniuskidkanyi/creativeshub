@@ -69,6 +69,17 @@ module ApplicationHelper
     end
   end
 
+  # Inlines an asset-pipeline image as a data URI. PDFs need this: wkhtmltopdf
+  # renders from a temp file, so /assets/... URLs don't resolve, and Active
+  # Storage URL generation isn't available outside a request.
+  def asset_data_uri(name)
+    file = Rails.application.assets.load_path.find(name)
+    return unless file
+
+    mime = Marcel::MimeType.for(file.path)
+    "data:#{mime};base64,#{Base64.strict_encode64(File.binread(file.path))}"
+  end
+
   def base64_logo(account)
     return unless account.logo.attached?
 
