@@ -1,13 +1,31 @@
 class ModemPayService
   BASE_URL = "https://api.modempay.com"
-  API_KEY = Rails.application.credentials.modempay_api_secret!
+
+  # Live keys in production, test keys in every other environment. The
+  # unsuffixed credentials hold the test keys; the _live variants go live.
+  LIVE_MODE = Rails.env.production?
+
+  API_KEY = if LIVE_MODE
+    Rails.application.credentials.modempay_api_secret_live!
+  else
+    Rails.application.credentials.modempay_api_secret!
+  end
+
   # Modem Pay signs webhooks with a per-mode secret: test-mode events are
   # signed with the test webhook secret, live events with the live one.
-  # Configure whichever apply; verification accepts a match against either.
-  WEBHOOK_SECRETS = [
-    Rails.application.credentials.modempay_webhook_secret_hash,
-    Rails.application.credentials.modempay_test_webhook_secret_hash
-  ].compact.reject { |s| s.to_s.strip.empty? }.freeze
+  # The environment's own secret comes first; the other stays as a fallback
+  # so e.g. a test-mode charge against production still verifies.
+  WEBHOOK_SECRETS = if LIVE_MODE
+    [
+      Rails.application.credentials.modempay_webhook_secret_hash_live,
+      Rails.application.credentials.modempay_webhook_secret_hash
+    ]
+  else
+    [
+      Rails.application.credentials.modempay_webhook_secret_hash,
+      Rails.application.credentials.modempay_webhook_secret_hash_live
+    ]
+  end.compact.reject { |s| s.to_s.strip.empty? }.freeze
 
   class Result
     attr_reader :success, :payload, :error
