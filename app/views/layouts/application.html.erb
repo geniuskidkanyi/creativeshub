@@ -19,6 +19,9 @@
     <%= yield :head %>
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%# Layout marker: forces Turbo to full-reload when a visit crosses into a
+        page using a different layout (they have incompatible heads). %>
+    <meta name="app-layout" content="application" data-turbo-track="reload">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <style>
       [data-theme="light"] {

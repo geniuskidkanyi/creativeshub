@@ -15,7 +15,7 @@ puts "Seeding database..."
       confirmed_at: Time.current # confirmable: without this they can't log in
     )
     user.save!
-    puts "Created user: #{user.email} (password123) with account #{account.business_name}"
+    puts "Created user: #{user.email} with account #{account.business_name}"
   else
     puts "User already present: #{user.email}"
   end

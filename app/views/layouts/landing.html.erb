@@ -102,6 +102,9 @@
       [data-theme="dark"] .logo-dark { display: block; }
       [data-theme="light"] .logo-light { display: block; }
     </style>
+    <%# Layout marker: forces Turbo to full-reload when a visit crosses into a
+        page using a different layout (they have incompatible heads). %>
+    <meta name="app-layout" content="landing" data-turbo-track="reload">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
