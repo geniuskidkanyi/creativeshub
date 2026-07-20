@@ -118,14 +118,9 @@ mono = "'Geist Mono', monospace"
 
     <%# ─── Payment methods strip ─── %>
     <section id="payments" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-card)">
-      <div class="sp-strip-inner">
+      <div class="sp-strip-inner display:flex;align-items:center;justify-content:space-between;gap:30px">
         <span style="font-size:13px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Accepted methods</span>
-        <% [["W", "Wave"], ["V", "Visa"], ["A", "Afrimoney"], ["Q", "QMoney"], ["A", "APS"]].each do |i, name| %>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span class="sp-badge"><%= i %></span>
-            <span style="font-weight:600;color:var(--text)"><%= name %></span>
-          </div>
-        <% end %>
+       <%= image_tag "SmartPay_payment_methods.png", class: "w-auto h-auto" %>
       </div>
     </section>
 
