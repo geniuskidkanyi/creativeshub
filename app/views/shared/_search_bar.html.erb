@@ -1,0 +1,17 @@
+<%# GET form that filters the current index. Locals: url, placeholder, query. %>
+<%= form_with url: url, method: :get, data: { turbo_action: "replace" }, class: "mb-5" do %>
+  <div class="relative max-w-md">
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </span>
+    <input type="search" name="q" value="<%= query %>" placeholder="<%= placeholder %>"
+           autocomplete="off"
+           class="w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground pl-9 pr-20 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+    <div class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+      <% if query.present? %>
+        <%= link_to "Clear", url, class: "text-xs text-muted-foreground hover:text-foreground px-2 py-1" %>
+      <% end %>
+      <button type="submit" class="text-xs font-medium bg-secondary text-secondary-foreground rounded px-2.5 py-1 hover:bg-secondary/80 transition-colors">Search</button>
+    </div>
+  </div>
+<% end %>

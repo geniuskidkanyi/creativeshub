@@ -115,7 +115,7 @@ max_channel = [@channel_totals.map(&:last).max.to_f, 1].max
           <span class="text-muted-foreground truncate"><%= invoice.invoice_number %></span>
           <span class="text-muted-foreground hidden sm:block"><%= invoice.due_date&.strftime("%b %d") || "—" %></span>
           <span class="flex items-center gap-3 justify-end">
-            <span class="font-bold text-foreground">D<%= number_with_delimiter(number_with_precision(invoice.total_amount, precision: 0)) %></span>
+            <span class="font-bold text-foreground"><%= invoice.currency_symbol %><%= number_with_delimiter(number_with_precision(invoice.total_amount, precision: 0)) %></span>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-md <%= status_badge(invoice.status) %>"><%= invoice.status.humanize %></span>
           </span>
         <% end %>

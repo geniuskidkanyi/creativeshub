@@ -2,13 +2,15 @@
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Clients</h1>
-      <p class="text-sm text-muted-foreground"><%= @clients.count %> clients</p>
+      <p class="text-sm text-muted-foreground"><%= pluralize(@pagy.count, "client") %></p>
     </div>
     <%= link_to new_client_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
       Add Client
     <% end %>
   </div>
+
+  <%= render "shared/search_bar", url: clients_path, placeholder: "Search by name, email, company or phone…", query: @q %>
 
   <% if @clients.any? %>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -44,11 +46,18 @@
         </div>
       <% end %>
     </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
   <% else %>
     <div class="bg-card border border-border rounded-lg p-12 text-center">
       <svg class="w-12 h-12 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      <p class="text-muted-foreground mb-4">No clients yet.</p>
-      <%= link_to "Add your first client", new_client_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% if @q.present? %>
+        <p class="text-muted-foreground mb-4">No clients match “<%= @q %>”.</p>
+        <%= link_to "Clear search", clients_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% else %>
+        <p class="text-muted-foreground mb-4">No clients yet.</p>
+        <%= link_to "Add your first client", new_client_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% end %>
     </div>
   <% end %>
 </div>

@@ -1,0 +1,17 @@
+<%
+  tone = case import.status
+         when "completed" then "bg-primary/15 text-primary"
+         when "failed" then "bg-destructive/15 text-destructive"
+         when "previewed" then "bg-amber-500/15 text-amber-500"
+         else "bg-muted text-muted-foreground"
+         end
+  label = case import.status
+          when "previewing" then "Reading…"
+          when "previewed" then "Ready to import"
+          when "importing" then "Importing…"
+          when "completed" then "Imported"
+          when "failed" then "Failed"
+          else "Queued"
+          end
+%>
+<span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full <%= tone %>"><%= label %></span>

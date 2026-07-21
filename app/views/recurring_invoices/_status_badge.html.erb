@@ -1,0 +1,8 @@
+<%
+  tone = case schedule.status
+         when "active" then "bg-primary/15 text-primary"
+         when "paused" then "bg-amber-500/15 text-amber-500"
+         else "bg-muted text-muted-foreground"
+         end
+%>
+<span class="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full <%= tone %>"><%= schedule.status.capitalize %></span>

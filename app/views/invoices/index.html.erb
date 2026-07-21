@@ -2,13 +2,15 @@
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Invoices</h1>
-      <p class="text-sm text-muted-foreground"><%= @invoices.count %> invoices</p>
+      <p class="text-sm text-muted-foreground"><%= pluralize(@pagy.count, "invoice") %></p>
     </div>
     <%= link_to new_invoice_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       New Invoice
     <% end %>
   </div>
+
+  <%= render "shared/search_bar", url: invoices_path, placeholder: "Search by invoice number, client or notes…", query: @q %>
 
   <% if @invoices.any? %>
     <div class="bg-card border border-border rounded-lg overflow-hidden">
@@ -37,7 +39,7 @@
                     <%= invoice.status.humanize %>
                   </span>
                 </td>
-                <td class="px-5 py-3.5 text-sm text-foreground text-right font-medium">D<%= number_with_precision(invoice.total_amount || 0, precision: 0) %></td>
+                <td class="px-5 py-3.5 text-sm text-foreground text-right font-medium"><%= invoice.currency_symbol %><%= number_with_precision(invoice.total_amount || 0, precision: 0) %></td>
                 <td class="px-5 py-3.5 text-sm text-muted-foreground"><%= invoice.issue_date&.strftime("%b %d, %Y") || "—" %></td>
                 <td class="px-5 py-3.5 text-right">
                   <%= link_to "View", invoice_path(invoice), class: "text-xs text-primary hover:text-primary/80 mr-3" %>
@@ -49,11 +51,18 @@
         </table>
       </div>
     </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
   <% else %>
     <div class="bg-card border border-border rounded-lg p-12 text-center">
       <svg class="w-12 h-12 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-      <p class="text-muted-foreground mb-4">No invoices yet.</p>
-      <%= link_to "Create your first invoice", new_invoice_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% if @q.present? %>
+        <p class="text-muted-foreground mb-4">No invoices match “<%= @q %>”.</p>
+        <%= link_to "Clear search", invoices_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% else %>
+        <p class="text-muted-foreground mb-4">No invoices yet.</p>
+        <%= link_to "Create your first invoice", new_invoice_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% end %>
     </div>
   <% end %>
 </div>

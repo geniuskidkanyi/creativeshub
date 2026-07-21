@@ -3,7 +3,10 @@ class InvoiceItem < ApplicationRecord
 
   validates :description, presence: true
   validates :quantity, presence: true, numericality: { greater_than: 0 }
-  validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  # Negative prices are allowed so a discount can be expressed as its own
+  # line, which is how invoices are conventionally written and how imported
+  # ledgers record them.
+  validates :unit_price, presence: true, numericality: true
 
   before_save :calculate_amount
 

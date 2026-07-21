@@ -19,7 +19,9 @@ class Public::InvoicesController < ApplicationController
     @invoice.calculate_totals
     @invoice.save! if @invoice.changed?
 
-    amount = @invoice.total_amount.to_i
+    # Always charged in GMD (converted at the invoice's locked fx_rate for
+    # foreign-currency invoices) so settlement matches the account balance.
+    amount = @invoice.gmd_total.to_i
     if amount < 1
       return redirect_to public_invoice_path(@invoice.public_token), alert: "Invoice amount must be at least D1."
     end
@@ -28,7 +30,7 @@ class Public::InvoicesController < ApplicationController
 
     payment = @invoice.payments.create!(
       status: :pending,
-      amount: @invoice.total_amount,
+      amount: @invoice.gmd_total,
       currency: "GMD",
       payment_method: "payment_request"
     )

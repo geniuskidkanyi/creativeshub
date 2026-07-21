@@ -3,7 +3,7 @@ Invoice <%= @invoice.invoice_number %>
 
 Dear <%= @client.name %>,
 
-Attached is your invoice from <%= @account.business_name %> for <%= number_to_currency(@invoice.total_amount, unit: "D") %>.
+Attached is your invoice from <%= @account.business_name %> for <%= number_to_currency(@invoice.total_amount, unit: @invoice.currency_symbol) %>.
 
 Invoice #: <%= @invoice.invoice_number %>
 Issue Date: <%= @invoice.issue_date&.strftime("%B %d, %Y") %>

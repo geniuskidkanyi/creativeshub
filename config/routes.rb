@@ -37,6 +37,20 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :imports, only: [ :index, :show, :create, :destroy ] do
+    member do
+      post :commit
+    end
+  end
+
+  resources :recurring_invoices do
+    member do
+      post :pause
+      post :resume
+      post :generate_now
+    end
+  end
+
   resources :payouts, only: [ :index, :new, :create ]
   resources :payments, only: [ :show ]
 

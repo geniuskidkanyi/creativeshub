@@ -1,0 +1,130 @@
+<%# Auto-refreshes while the background job is working so the preview and the
+    final result appear without the user having to reload. %>
+<% if @import.pending? || @import.previewing? || @import.importing? %>
+  <meta http-equiv="refresh" content="2">
+<% end %>
+
+<div class="px-6 py-6 max-w-3xl">
+  <div class="mb-6">
+    <%= link_to "← Imports", imports_path, class: "text-xs text-muted-foreground hover:text-foreground transition-colors" %>
+    <div class="flex items-center gap-3 mt-3">
+      <h1 class="text-2xl text-foreground" style="font-family: var(--font-display)"><%= @import.original_filename || "Import" %></h1>
+      <%= render "imports/status_badge", import: @import %>
+    </div>
+    <p class="text-sm text-muted-foreground mt-1"><%= @import.label %></p>
+  </div>
+
+  <% if @import.failed? %>
+    <div class="rounded-lg bg-destructive/10 border border-destructive/30 p-4 mb-4">
+      <p class="text-sm text-destructive-foreground font-medium mb-1">This file couldn't be read</p>
+      <p class="text-xs text-muted-foreground font-mono"><%= @import.error_message %></p>
+    </div>
+
+  <% elsif @import.pending? || @import.previewing? || @import.importing? %>
+    <div class="rounded-lg bg-card border border-border p-6 text-center">
+      <p class="text-sm text-foreground"><%= @import.importing? ? "Importing your data…" : "Reading your file…" %></p>
+      <p class="text-xs text-muted-foreground mt-1">This page refreshes on its own.</p>
+    </div>
+
+  <% elsif @import.completed? %>
+    <div class="rounded-lg bg-card border border-border p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Import complete</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <% {
+             "Clients created" => @import.result["clients_created"],
+             "Clients updated" => @import.result["clients_updated"],
+             "Invoices created" => @import.result["invoices_created"],
+             "Line items" => @import.result["items_created"],
+             "Products created" => @import.result["products_created"],
+             "Already imported" => @import.result["invoices_skipped"]
+           }.reject { |_, v| v.to_i.zero? }.each do |label, value| %>
+          <div>
+            <div class="text-xl text-foreground font-semibold"><%= number_with_delimiter(value) %></div>
+            <div class="text-xs text-muted-foreground"><%= label %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @import.result["errors"].present? %>
+        <div class="mt-5 pt-4 border-t border-border">
+          <p class="text-xs text-destructive font-medium mb-2"><%= pluralize(@import.result["errors"].size, "row") %> couldn't be imported</p>
+          <ul class="space-y-1">
+            <% @import.result["errors"].first(10).each do |error| %>
+              <li class="text-xs text-muted-foreground font-mono"><%= error %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= link_to "View clients", clients_path, class: "px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium" %>
+      <%= link_to "View invoices", invoices_path, class: "px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium" %>
+    </div>
+
+  <% elsif @import.previewed? && !@import.supported? %>
+    <div class="rounded-lg bg-card border border-border p-5">
+      <p class="text-sm text-foreground font-medium mb-1">We can't import this file yet</p>
+      <p class="text-sm text-muted-foreground">SmartPay tracks money coming in — customers, invoices and payments. Vendor and bill exports cover money going out, which isn't supported yet.</p>
+    </div>
+
+  <% else %>
+    <%# Previewed and ready: show what committing would do. %>
+    <div class="rounded-lg bg-card border border-border p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Preview</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <% @import.preview_summary.reject { |_, v| v.to_i.zero? }.each do |label, value| %>
+          <div>
+            <div class="text-xl text-foreground font-semibold"><%= number_with_delimiter(value) %></div>
+            <div class="text-xs text-muted-foreground"><%= label %></div>
+          </div>
+        <% end %>
+      </div>
+      <% if @import.preview["total_value"].present? %>
+        <p class="text-xs text-muted-foreground mt-4 pt-4 border-t border-border">Total invoiced value: <span class="text-foreground font-medium">D<%= number_with_delimiter(@import.preview["total_value"]) %></span></p>
+      <% end %>
+    </div>
+
+    <% if @import.preview_warnings.any? %>
+      <div class="rounded-lg bg-amber-500/10 border border-amber-500/30 p-4 mb-4">
+        <p class="text-xs text-amber-500 font-medium mb-2">Before you import</p>
+        <ul class="space-y-1.5">
+          <% @import.preview_warnings.each do |warning| %>
+            <li class="text-xs text-muted-foreground">• <%= warning %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="rounded-lg bg-card border border-border overflow-hidden mb-4">
+      <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+        <span class="text-sm text-foreground font-medium">Sample rows</span>
+        <span class="text-xs text-muted-foreground">showing <%= @import.preview_rows.size %> of <%= number_with_delimiter(@import.preview["total_rows"]) %></span>
+      </div>
+      <div class="divide-y divide-border">
+        <% @import.preview_rows.each do |row| %>
+          <div class="px-4 py-2.5">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-sm text-foreground truncate"><%= row["name"] %></div>
+                <div class="text-xs text-muted-foreground truncate"><%= row["detail"] %></div>
+              </div>
+              <span class="shrink-0 text-xs px-2 py-0.5 rounded-full <%= row["status"] == "skip" ? "bg-muted text-muted-foreground" : "bg-primary/15 text-primary" %>"><%= row["status"] %></span>
+            </div>
+            <% row["warnings"].to_a.each do |warning| %>
+              <p class="text-xs text-amber-500 mt-1"><%= warning %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= button_to "Import #{number_with_delimiter(@import.preview['total_rows'])} rows", commit_import_path(@import),
+            class: "px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all cursor-pointer" %>
+      <%= button_to "Discard", import_path(@import), method: :delete,
+            class: "px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium cursor-pointer",
+            form: { data: { turbo_confirm: "Discard this upload?" } } %>
+    </div>
+  <% end %>
+</div>

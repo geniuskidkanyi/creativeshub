@@ -9,6 +9,7 @@ export default class extends Controller {
     const index = this.itemsTarget.children.length
     const newItem = template.replace(/NEW_RECORD/g, index)
     this.itemsTarget.insertAdjacentHTML("beforeend", newItem)
+    this.notifyChange()
   }
 
   remove(event) {
@@ -21,6 +22,7 @@ export default class extends Controller {
     } else {
       item.remove()
     }
+    this.notifyChange()
   }
 
   addProduct(event) {
@@ -36,5 +38,12 @@ export default class extends Controller {
     if (desc) desc.value = product.name
     if (qty) qty.value = 1
     if (price) price.value = parseFloat(product.unit_price).toFixed(0)
+    // Values are set programmatically, which fires no input event — announce
+    // it so any total watching this form (the recurring wizard) recomputes.
+    this.notifyChange()
+  }
+
+  notifyChange() {
+    this.element.dispatchEvent(new CustomEvent("line-items:changed", { bubbles: true }))
   }
 }

@@ -97,8 +97,8 @@
             <tr>
               <td class="py-3 text-sm text-foreground"><%= item.description %></td>
               <td class="py-3 text-sm text-foreground text-right"><%= item.quantity %></td>
-              <td class="py-3 text-sm text-foreground text-right">D<%= number_with_precision(item.unit_price, precision: 0) %></td>
-              <td class="py-3 text-sm text-foreground text-right font-medium">D<%= number_with_precision(item.amount, precision: 0) %></td>
+              <td class="py-3 text-sm text-foreground text-right"><%= @invoice.currency_symbol %><%= number_with_precision(item.unit_price, precision: 0) %></td>
+              <td class="py-3 text-sm text-foreground text-right font-medium"><%= @invoice.currency_symbol %><%= number_with_precision(item.amount, precision: 0) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -109,18 +109,24 @@
       <div class="w-64 space-y-2">
         <div class="flex justify-between text-sm text-muted-foreground">
           <span>Subtotal</span>
-          <span class="text-foreground">D<%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
+          <span class="text-foreground"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
         </div>
         <% if @invoice.tax_rate.to_f > 0 %>
           <div class="flex justify-between text-sm text-muted-foreground">
             <span>Tax (<%= @invoice.tax_rate %> %)</span>
-            <span class="text-foreground">D<%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
+            <span class="text-foreground"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
           </div>
         <% end %>
         <div class="flex justify-between text-base font-medium border-t border-border pt-2">
           <span class="text-foreground">Total</span>
-          <span class="text-primary">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
+          <span class="text-primary"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
         </div>
+        <% unless @invoice.base_currency? %>
+          <div class="flex justify-between text-xs text-muted-foreground border-t border-border pt-2">
+            <span>Charged in GMD (rate <%= @invoice.fx_rate %>)</span>
+            <span>D<%= number_with_delimiter(number_with_precision(@invoice.gmd_total, precision: 0)) %></span>
+          </div>
+        <% end %>
       </div>
     </div>
 

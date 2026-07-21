@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Tenantable
+  include Pagy::Method
 
   layout :layout_by_controller
 

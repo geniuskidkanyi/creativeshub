@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_21_093957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "accounts", force: :cascade do |t|
     t.text "address"
@@ -67,9 +68,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.string "company"
     t.datetime "created_at", null: false
     t.string "email"
+    t.string "external_ref"
+    t.string "external_source"
     t.string "name"
     t.string "phone"
     t.datetime "updated_at", null: false
+    t.index ["account_id", "external_source", "external_ref"], name: "index_clients_on_external_ref", unique: true, where: "(external_ref IS NOT NULL)"
     t.index ["account_id"], name: "index_clients_on_account_id"
   end
 
@@ -88,13 +92,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.bigint "account_id", null: false
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
+    t.string "currency", default: "GMD", null: false
     t.date "due_date"
+    t.string "external_ref"
+    t.string "external_source"
+    t.decimal "fx_rate", precision: 18, scale: 6, default: "1.0", null: false
     t.string "invoice_number"
     t.date "issue_date"
     t.text "notes"
     t.datetime "paid_date"
     t.string "payment_method"
     t.string "public_token"
+    t.bigint "recurring_invoice_id"
     t.string "status"
     t.decimal "subtotal"
     t.decimal "tax_amount"
@@ -102,9 +111,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.decimal "total_amount"
     t.datetime "updated_at", null: false
     t.uuid "uuid", null: false
+    t.index ["account_id", "external_source", "external_ref"], name: "index_invoices_on_external_ref", unique: true, where: "(external_ref IS NOT NULL)"
     t.index ["account_id"], name: "index_invoices_on_account_id"
     t.index ["client_id"], name: "index_invoices_on_client_id"
     t.index ["public_token"], name: "index_invoices_on_public_token", unique: true
+    t.index ["recurring_invoice_id"], name: "index_invoices_on_recurring_invoice_id"
     t.index ["uuid"], name: "index_invoices_on_uuid", unique: true
   end
 
@@ -167,6 +178,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "step"], name: "index_qr_scans_on_account_id_and_step", unique: true
     t.index ["account_id"], name: "index_qr_scans_on_account_id"
+  end
+
+  create_table "recurring_invoice_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.integer "position", default: 0
+    t.decimal "quantity", default: "1.0"
+    t.bigint "recurring_invoice_id", null: false
+    t.decimal "unit_price"
+    t.datetime "updated_at", null: false
+    t.index ["recurring_invoice_id"], name: "index_recurring_invoice_items_on_recurring_invoice_id"
+  end
+
+  create_table "recurring_invoices", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "auto_send", default: false, null: false
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "GMD", null: false
+    t.integer "due_in_days", default: 14, null: false
+    t.date "end_date"
+    t.string "frequency", default: "monthly", null: false
+    t.decimal "fx_rate", precision: 18, scale: 6, default: "1.0", null: false
+    t.integer "interval", default: 1, null: false
+    t.date "last_run_on"
+    t.integer "max_occurrences"
+    t.date "next_run_on"
+    t.text "notes"
+    t.integer "occurrences_count", default: 0, null: false
+    t.date "start_date", null: false
+    t.string "status", default: "active", null: false
+    t.decimal "tax_rate", default: "0.0"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_recurring_invoices_on_account_id"
+    t.index ["client_id"], name: "index_recurring_invoices_on_client_id"
+    t.index ["status", "next_run_on"], name: "index_recurring_invoices_on_status_and_next_run_on"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -333,6 +381,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "wave_imports", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "committed_at"
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "kind"
+    t.string "original_filename"
+    t.jsonb "preview", default: {}, null: false
+    t.datetime "previewed_at"
+    t.jsonb "result", default: {}, null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["account_id", "created_at"], name: "index_wave_imports_on_account_id_and_created_at"
+    t.index ["account_id"], name: "index_wave_imports_on_account_id"
+    t.index ["user_id"], name: "index_wave_imports_on_user_id"
+  end
+
   create_table "webhook_events", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "event_id"
@@ -349,15 +415,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
   add_foreign_key "invoice_items", "invoices"
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"
+  add_foreign_key "invoices", "recurring_invoices"
   add_foreign_key "payments", "accounts"
   add_foreign_key "payments", "invoices"
   add_foreign_key "payouts", "accounts"
   add_foreign_key "products", "accounts"
   add_foreign_key "qr_scans", "accounts"
+  add_foreign_key "recurring_invoice_items", "recurring_invoices"
+  add_foreign_key "recurring_invoices", "accounts"
+  add_foreign_key "recurring_invoices", "clients"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "wave_imports", "accounts"
+  add_foreign_key "wave_imports", "users"
 end

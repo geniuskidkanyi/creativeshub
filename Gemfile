@@ -30,6 +30,10 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
+
+# Parsing accounting exports on import. No longer a Ruby default gem, and
+# only present transitively otherwise.
+gem "csv"
 gem "solid_cable"
 gem 'puma-daemon', require: false
 
@@ -67,6 +71,9 @@ gem "money-rails"
 
 # Pagination
 gem "pagy"
+
+# Full-text search over Postgres (tsearch + trigram), account-scoped.
+gem "pg_search"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

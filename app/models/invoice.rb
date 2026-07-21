@@ -1,6 +1,25 @@
 class Invoice < ApplicationRecord
+  include Currencies
+
   belongs_to :account
   belongs_to :client
+
+  # Invoices are looked up by number far more than by fuzzy text, and invoice
+  # numbers run in sequence (…0006, 0007, 0008). Full-text/trigram either
+  # misses a partial number ("0007") or floods the results with its
+  # neighbours, so a plain substring match is both more precise and more
+  # predictable here. Searches number, notes, and the billed client.
+  def self.search_all(query)
+    term = "%#{sanitize_sql_like(query.to_s.strip)}%"
+    left_joins(:client)
+      .where(
+        "invoices.invoice_number ILIKE :t OR invoices.notes ILIKE :t OR " \
+        "clients.name ILIKE :t OR clients.company ILIKE :t OR clients.email ILIKE :t",
+        t: term
+      )
+      .distinct
+  end
+  belongs_to :recurring_invoice, optional: true
   has_many :invoice_items, dependent: :destroy
   has_many :payments, dependent: :destroy
 
@@ -10,7 +29,10 @@ class Invoice < ApplicationRecord
 
   validates :invoice_number, uniqueness: { scope: :account_id }, allow_nil: true
   validates :status, presence: true
+  validates :currency, inclusion: { in: CURRENCIES.keys }
+  validates :fx_rate, numericality: { greater_than: 0 }
 
+  before_validation :normalize_currency
   before_create :generate_invoice_number
   before_create :generate_public_token
   before_create :generate_uuid
@@ -43,7 +65,21 @@ class Invoice < ApplicationRecord
     self.total_amount = (subtotal + tax_amount).round(2)
   end
 
+  # The invoice total converted to GMD at its locked rate — this is what the
+  # customer is actually charged, so a non-GMD invoice still settles into the
+  # account's GMD balance. GMD invoices convert at 1.
+  def gmd_total
+    ((total_amount || 0) * (fx_rate || 1)).round(2)
+  end
+
   private
+
+  # GMD is the base currency and never carries a rate other than 1; clearing
+  # any stray value keeps gmd_total honest.
+  def normalize_currency
+    self.currency = BASE_CURRENCY if currency.blank?
+    self.fx_rate = 1 if base_currency?
+  end
 
   def generate_invoice_number
     return if invoice_number.present?

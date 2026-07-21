@@ -2,7 +2,7 @@
 
 <p>Dear <%= @client.name %>,</p>
 
-<p>Attached is your invoice from <%= @account.business_name %> for <%= number_to_currency(@invoice.total_amount, unit: "D") %>.</p>
+<p>Attached is your invoice from <%= @account.business_name %> for <%= number_to_currency(@invoice.total_amount, unit: @invoice.currency_symbol) %>.</p>
 
 <p>
   <strong>Invoice #:</strong> <%= @invoice.invoice_number %><br>

@@ -26,7 +26,10 @@
           </span>
         </div>
         <div class="text-right">
-          <p class="text-2xl text-primary" style="font-family: var(--font-display)">D<%= number_with_precision(@invoice.total_amount, precision: 0) %></p>
+          <p class="text-2xl text-primary" style="font-family: var(--font-display)"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.total_amount, precision: 0) %></p>
+          <% unless @invoice.base_currency? %>
+            <p class="text-xs text-muted-foreground mt-0.5">Charged as D<%= number_with_delimiter(number_with_precision(@invoice.gmd_total, precision: 0)) %></p>
+          <% end %>
         </div>
       </div>
 
@@ -66,8 +69,8 @@
             <tr>
               <td class="py-2 text-sm text-foreground"><%= item.description %></td>
               <td class="py-2 text-sm text-foreground text-right"><%= item.quantity %></td>
-              <td class="py-2 text-sm text-foreground text-right">D<%= number_with_precision(item.unit_price, precision: 0) %></td>
-              <td class="py-2 text-sm text-foreground text-right font-medium">D<%= number_with_precision(item.amount, precision: 0) %></td>
+              <td class="py-2 text-sm text-foreground text-right"><%= @invoice.currency_symbol %><%= number_with_precision(item.unit_price, precision: 0) %></td>
+              <td class="py-2 text-sm text-foreground text-right font-medium"><%= @invoice.currency_symbol %><%= number_with_precision(item.amount, precision: 0) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -77,18 +80,24 @@
         <div class="w-64 space-y-2">
           <div class="flex justify-between text-sm text-muted-foreground">
             <span>Subtotal</span>
-            <span class="text-foreground">D<%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
+            <span class="text-foreground"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
           </div>
           <% if @invoice.tax_rate.to_f > 0 %>
             <div class="flex justify-between text-sm text-muted-foreground">
               <span>Tax (<%= @invoice.tax_rate %> %)</span>
-              <span class="text-foreground">D<%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
+              <span class="text-foreground"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.tax_amount || 0, precision: 0) %></span>
             </div>
           <% end %>
           <div class="flex justify-between text-base font-medium border-t border-border pt-2">
             <span class="text-foreground">Total</span>
-            <span class="text-primary">D<%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
+            <span class="text-primary"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.total_amount || 0, precision: 0) %></span>
           </div>
+          <% unless @invoice.base_currency? %>
+            <div class="flex justify-between text-xs text-muted-foreground border-t border-border pt-2">
+              <span>Charged in GMD</span>
+              <span>D<%= number_with_delimiter(number_with_precision(@invoice.gmd_total, precision: 0)) %></span>
+            </div>
+          <% end %>
         </div>
       </div>
 
@@ -104,7 +113,7 @@
       <div class="text-center space-y-4">
         <%= link_to pay_public_invoice_path(@invoice.public_token), class: "inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Pay D<%= number_with_precision(@invoice.total_amount, precision: 0) %>
+          Pay D<%= number_with_delimiter(number_with_precision(@invoice.gmd_total, precision: 0)) %>
         <% end %>
         <p class="text-xs text-muted-foreground">You will be redirected to ModemPay to complete payment</p>
 

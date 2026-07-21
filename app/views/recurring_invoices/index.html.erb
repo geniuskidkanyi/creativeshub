@@ -1,0 +1,49 @@
+<div class="px-6 py-6">
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-2xl text-foreground" style="font-family: var(--font-display)">Recurring invoices</h1>
+      <p class="text-sm text-muted-foreground mt-1">Bill the same client on a schedule — SmartPay raises each invoice for you.</p>
+    </div>
+    <%= link_to "New schedule", new_recurring_invoice_path, class: "shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all" %>
+  </div>
+
+  <%= render "shared/search_bar", url: recurring_invoices_path, placeholder: "Search by name or client…", query: @q %>
+
+  <% if @recurring_invoices.any? %>
+    <div class="space-y-2">
+      <% @recurring_invoices.each do |schedule| %>
+        <%= link_to recurring_invoice_path(schedule), class: "flex items-center justify-between gap-4 bg-card border border-border rounded-lg px-4 py-3.5 hover:border-primary/40 transition-colors" do %>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-foreground font-medium truncate"><%= schedule.title.presence || schedule.client.name %></span>
+              <%= render "recurring_invoices/status_badge", schedule: schedule %>
+            </div>
+            <div class="text-xs text-muted-foreground mt-0.5 truncate">
+              <%= schedule.client.name %> · <%= schedule.schedule_description %>
+              <% if schedule.active? && schedule.next_run_on %>
+                · next <%= schedule.next_run_on.to_fs(:long) %>
+              <% end %>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-sm text-foreground font-semibold"><%= schedule.currency_symbol %><%= number_with_delimiter(schedule.estimated_total) %></div>
+            <div class="text-xs text-muted-foreground"><%= pluralize(schedule.occurrences_count, "sent") %></div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% else %>
+    <div class="bg-card border border-border rounded-lg p-10 text-center">
+      <% if @q.present? %>
+        <p class="text-sm text-foreground font-medium mb-1">No schedules match “<%= @q %>”</p>
+        <%= link_to "Clear search", recurring_invoices_path, class: "inline-block mt-3 text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% else %>
+        <p class="text-sm text-foreground font-medium mb-1">No recurring invoices yet</p>
+        <p class="text-sm text-muted-foreground mb-5">Set one up for retainers, hosting or any fee you bill on a cycle.</p>
+        <%= link_to "Create a schedule", new_recurring_invoice_path, class: "inline-block px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

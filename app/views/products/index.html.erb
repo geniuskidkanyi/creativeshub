@@ -2,13 +2,15 @@
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl text-foreground mb-1" style="font-family: var(--font-display)">Products & Services</h1>
-      <p class="text-sm text-muted-foreground"><%= @products.count %> products</p>
+      <p class="text-sm text-muted-foreground"><%= pluralize(@pagy.count, "product") %></p>
     </div>
     <%= link_to new_product_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:brightness-110 transition-all" do %>
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Product
     <% end %>
   </div>
+
+  <%= render "shared/search_bar", url: products_path, placeholder: "Search products by name or description…", query: @q %>
 
   <% if @products.any? %>
     <div class="bg-card border border-border rounded-lg overflow-hidden">
@@ -38,10 +40,17 @@
         </table>
       </div>
     </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
   <% else %>
     <div class="bg-card border border-border rounded-lg p-12 text-center">
-      <p class="text-muted-foreground mb-4">No products yet. Add your services and products to quickly build invoices.</p>
-      <%= link_to "Add your first product", new_product_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% if @q.present? %>
+        <p class="text-muted-foreground mb-4">No products match “<%= @q %>”.</p>
+        <%= link_to "Clear search", products_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% else %>
+        <p class="text-muted-foreground mb-4">No products yet. Add your services and products to quickly build invoices.</p>
+        <%= link_to "Add your first product", new_product_path, class: "text-primary hover:text-primary/80 font-medium text-sm" %>
+      <% end %>
     </div>
   <% end %>
 </div>

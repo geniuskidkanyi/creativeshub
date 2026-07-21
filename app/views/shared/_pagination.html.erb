@@ -1,0 +1,20 @@
+<%# Tailwind pager for a Pagy::Offset object passed as `pagy`. page_url keeps
+    the current query string (including ?q=) so search survives paging. %>
+<% if pagy.pages > 1 %>
+  <nav class="flex items-center justify-between mt-6 pt-4 border-t border-border">
+    <p class="text-xs text-muted-foreground"><%= pagy.from %>–<%= pagy.to %> of <%= pagy.count %></p>
+    <div class="flex items-center gap-1.5">
+      <% if pagy.previous %>
+        <%= link_to "← Prev", pagy.page_url(:previous), class: "text-xs font-medium px-3 py-1.5 rounded-md border border-border text-foreground hover:bg-muted/50 transition-colors" %>
+      <% else %>
+        <span class="text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground/40 cursor-default">← Prev</span>
+      <% end %>
+      <span class="text-xs text-muted-foreground px-2">Page <%= pagy.page %> of <%= pagy.pages %></span>
+      <% if pagy.next %>
+        <%= link_to "Next →", pagy.page_url(:next), class: "text-xs font-medium px-3 py-1.5 rounded-md border border-border text-foreground hover:bg-muted/50 transition-colors" %>
+      <% else %>
+        <span class="text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground/40 cursor-default">Next →</span>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

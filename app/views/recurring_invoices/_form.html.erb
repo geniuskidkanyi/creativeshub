@@ -1,0 +1,267 @@
+<%
+  # Land on the schedule step if that's where validation failed, otherwise the
+  # first step owns the error.
+  schedule_fields = %i[frequency interval start_date end_date max_occurrences]
+  start_step = @recurring_invoice.errors.attribute_names.intersect?(schedule_fields) ? 2 : 1
+
+  # Which "and end…" option to show first, inferred from saved values.
+  end_mode = if @recurring_invoice.max_occurrences.present? then "after"
+             elsif @recurring_invoice.end_date.present? then "on"
+             else "never"
+             end
+%>
+
+<div data-controller="client-search"
+     data-client-search-url-value="<%= search_clients_path %>"
+     <% if @recurring_invoice.client %>data-client-search-selected-id-value="<%= @recurring_invoice.client_id %>" data-client-search-selected-name-value="<%= @recurring_invoice.client.name %>"<% end %>>
+
+<%= form_with model: @recurring_invoice,
+      data: { controller: "wizard invoice-form", wizard_start_step: start_step } do |f| %>
+
+  <% if @recurring_invoice.errors.any? %>
+    <div class="rounded-md bg-destructive/10 border border-destructive/30 p-4 mb-6">
+      <ul class="list-disc pl-5 space-y-1 text-sm text-destructive-foreground">
+        <% @recurring_invoice.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# ─── Step header ─── %>
+  <div class="flex items-center gap-2 sm:gap-4 mb-6">
+    <% [ [ 1, "Invoice" ], [ 2, "Schedule" ], [ 3, "Get paid & send" ] ].each_with_index do |(num, label), idx| %>
+      <% if idx.positive? %><div class="h-px flex-1 bg-border"></div><% end %>
+      <button type="button" data-wizard-target="indicator" data-step="<%= num %>"
+              data-state="<%= num == start_step ? 'active' : (num < start_step ? 'done' : 'todo') %>"
+              data-action="wizard#goTo"
+              class="group flex items-center gap-2 shrink-0">
+        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border transition-colors
+                     group-data-[state=todo]:border-border group-data-[state=todo]:text-muted-foreground
+                     group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:border-primary
+                     group-data-[state=done]:bg-primary/15 group-data-[state=done]:text-primary group-data-[state=done]:border-primary/30"><%= num %></span>
+        <span class="text-sm hidden sm:inline transition-colors
+                     group-data-[state=todo]:text-muted-foreground
+                     group-data-[state=active]:text-foreground group-data-[state=active]:font-medium
+                     group-data-[state=done]:text-foreground"><%= label %></span>
+      </button>
+    <% end %>
+  </div>
+
+  <%# ═══════════ Step 1 · Invoice ═══════════ %>
+  <div data-wizard-target="panel" data-step="1">
+    <div data-wizard-target="error" data-step="1" class="hidden rounded-md bg-destructive/10 border border-destructive/30 px-4 py-2.5 mb-4 text-sm text-destructive-foreground"></div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Who and what</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :client_id, "Customer", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <div class="relative">
+            <%= f.hidden_field :client_id, data: { client_search_target: "hidden" } %>
+            <input type="text"
+                   data-client-search-target="input"
+                   data-action="input->client-search#search focus->client-search#focus"
+                   placeholder="Search or add a customer..."
+                   autocomplete="off"
+                   class="w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+            <button type="button" data-action="click->client-search#clearSelection" class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div data-client-search-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div data-client-search-target="searchResults"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <%= f.label :title, "Name (optional)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.text_field :title, placeholder: "Monthly hosting retainer",
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div>
+          <%= f.label :due_in_days, "Payment due", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.select :due_in_days,
+                [ [ "On receipt", 0 ], [ "Within 7 days", 7 ], [ "Within 14 days", 14 ], [ "Within 30 days", 30 ] ],
+                {}, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm text-foreground font-medium">Product / Service</h2>
+        <button type="button" data-action="invoice-form#add" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add an item
+        </button>
+      </div>
+
+      <div data-controller="product-search" data-action="product-search:add->invoice-form#addProduct" class="mb-4 relative">
+        <input type="text"
+               data-product-search-target="input"
+               data-action="input->product-search#search focus->product-search#focus"
+               placeholder="Search products & services..."
+               autocomplete="off"
+               class="w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <div data-product-search-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+          <div data-product-search-target="results"></div>
+        </div>
+      </div>
+
+      <div data-invoice-form-target="items">
+        <%= f.fields_for :recurring_invoice_items do |item| %>
+          <%= render "recurring_invoices/item_fields", item: item, removable: item.object.persisted? %>
+        <% end %>
+      </div>
+
+      <template data-invoice-form-target="template">
+        <%= f.fields_for :recurring_invoice_items, RecurringInvoiceItem.new, child_index: "NEW_RECORD" do |item| %>
+          <%= render "recurring_invoices/item_fields", item: item, removable: true %>
+        <% end %>
+      </template>
+
+      <div class="mt-4 pt-4 border-t border-border grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <%= f.label :currency, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.select :currency, RecurringInvoice.currency_options, {},
+                data: { action: "wizard#currencyChanged" },
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div>
+          <%= f.label :tax_rate, "Tax rate (%)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :tax_rate, step: "any", value: @recurring_invoice.tax_rate || 0,
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div data-rate-field class="<%= "hidden" if @recurring_invoice.base_currency? %>">
+          <%= f.label :fx_rate, "Rate to GMD", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :fx_rate, step: "any", min: "0", value: @recurring_invoice.fx_rate || 1,
+                data: { action: "wizard#currencyChanged" },
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-border flex flex-col gap-1 items-end">
+        <div class="flex items-center gap-6">
+          <span class="text-sm text-muted-foreground">Total per invoice</span>
+          <span class="text-lg text-foreground font-semibold" data-wizard-target="total">D0.00</span>
+        </div>
+        <p data-currency-hint class="hidden text-xs text-muted-foreground">Customer is charged in Dalasi — about <span data-currency-hint-amount class="text-foreground font-medium">D0</span>.</p>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <%= f.label :notes, "Notes / Terms", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+      <%= f.text_area :notes, rows: 2, placeholder: "Appears on every invoice",
+            class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+    </div>
+
+    <div class="flex items-center gap-3 mt-6">
+      <button type="button" data-action="wizard#next" class="px-5 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all">Next</button>
+      <%= link_to "Cancel", recurring_invoices_path, class: "px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium" %>
+    </div>
+  </div>
+
+  <%# ═══════════ Step 2 · Schedule ═══════════ %>
+  <div data-wizard-target="panel" data-step="2" class="hidden">
+    <div data-wizard-target="error" data-step="2" class="hidden rounded-md bg-destructive/10 border border-destructive/30 px-4 py-2.5 mb-4 text-sm text-destructive-foreground"></div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Set schedule</h2>
+
+      <div class="flex flex-wrap items-end gap-3 mb-4">
+        <span class="text-sm text-muted-foreground pb-2">Repeat every</span>
+        <div class="w-20">
+          <%= f.number_field :interval, min: 1, step: 1, value: @recurring_invoice.interval || 1,
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div class="w-40">
+          <%= f.select :frequency, RecurringInvoice::FREQUENCIES.keys.map { |k| [ k.capitalize, k ] }, {},
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :start_date, "Create first invoice on", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.date_field :start_date, value: @recurring_invoice.start_date || Date.current, min: Date.current,
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div>
+          <label class="block text-xs text-muted-foreground uppercase tracking-wider mb-1.5">And end</label>
+          <select data-wizard-end-mode data-action="wizard#endMode"
+                  class="w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="never" <%= "selected" if end_mode == "never" %>>Never</option>
+            <option value="on" <%= "selected" if end_mode == "on" %>>On a date</option>
+            <option value="after" <%= "selected" if end_mode == "after" %>>After a number of invoices</option>
+          </select>
+        </div>
+        <div data-end-field class="<%= "hidden" unless end_mode == "on" %>">
+          <%= f.label :end_date, "End date", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.date_field :end_date, min: Date.current, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div data-end-field class="<%= "hidden" unless end_mode == "after" %>">
+          <%= f.label :max_occurrences, "Number of invoices", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :max_occurrences, min: 1, step: 1, placeholder: "e.g. 12",
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="button" data-action="wizard#back" class="px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium">Back</button>
+      <button type="button" data-action="wizard#next" class="px-5 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all">Next</button>
+    </div>
+  </div>
+
+  <%# ═══════════ Step 3 · Get paid & send ═══════════ %>
+  <div data-wizard-target="panel" data-step="3" class="hidden">
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-1">Get paid</h2>
+      <p class="text-sm text-muted-foreground mb-4">Every invoice this schedule creates carries a payment link. Your customer can pay by Wave, Visa, Afrimoney, QMoney or APS — settled straight to your balance.</p>
+      <div class="flex flex-wrap gap-2">
+        <% [ [ "Wave", 155 ], [ "Visa", 265 ], [ "Afrimoney", 30 ], [ "QMoney", 300 ], [ "APS", 55 ] ].each do |name, hue| %>
+          <span class="inline-flex items-center gap-1.5 text-xs text-foreground bg-muted/40 border border-border rounded-md px-2.5 py-1">
+            <span class="w-2 h-2 rounded-full" style="background:oklch(.6 .13 <%= hue %>)"></span><%= name %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-4">Send</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="group cursor-pointer">
+          <%= f.radio_button :auto_send, true, class: "peer sr-only", checked: @recurring_invoice.auto_send? %>
+          <div class="h-full rounded-lg border border-border p-4 peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+            <div class="text-sm text-foreground font-medium mb-1">Send automatically</div>
+            <div class="text-xs text-muted-foreground">We email each invoice to the customer the moment it's created.</div>
+          </div>
+        </label>
+        <label class="group cursor-pointer">
+          <%= f.radio_button :auto_send, false, class: "peer sr-only", checked: !@recurring_invoice.auto_send? %>
+          <div class="h-full rounded-lg border border-border p-4 peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+            <div class="text-sm text-foreground font-medium mb-1">Send manually</div>
+            <div class="text-xs text-muted-foreground">Each invoice is created as a draft for you to review and send.</div>
+          </div>
+        </label>
+      </div>
+      <p class="text-xs text-amber-500 mt-3">Automatic sending only works for customers with an email on file. Others are still created and can be shared by link.</p>
+    </div>
+
+    <div class="bg-card border border-border rounded-lg p-5 mb-4">
+      <h2 class="text-sm text-foreground font-medium mb-3">Review</h2>
+      <div data-wizard-target="summary"></div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="button" data-action="wizard#back" class="px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium">Back</button>
+      <%= f.submit @recurring_invoice.persisted? ? "Save changes" : "Schedule recurring invoice",
+            class: "px-5 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all cursor-pointer" %>
+    </div>
+  </div>
+<% end %>
+
+  <%# Rendered outside the wizard form — the modal carries its own <form> to
+      create a client inline, and forms can't nest. %>
+  <%= render "shared/client_modal" %>
+</div>

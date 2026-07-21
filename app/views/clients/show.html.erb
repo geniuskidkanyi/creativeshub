@@ -52,7 +52,7 @@
                   <p class="text-xs text-muted-foreground"><%= inv.issue_date&.strftime("%b %d, %Y") %></p>
                 </div>
                 <div class="text-right">
-                  <p class="text-sm text-foreground font-medium">D<%= number_with_precision(inv.total_amount, precision: 0) %></p>
+                  <p class="text-sm text-foreground font-medium"><%= inv.currency_symbol %><%= number_with_precision(inv.total_amount, precision: 0) %></p>
                   <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs <%= status_badge(inv.status) %>">
                     <span class="w-1.5 h-1.5 rounded-full <%= status_dot(inv.status) %>"></span>
                     <%= inv.status.humanize %>

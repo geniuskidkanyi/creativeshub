@@ -2,7 +2,10 @@ class ClientsController < ApplicationController
   before_action :set_client, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @clients = current_account.clients.ordered
+    @q = params[:q].to_s.strip
+    scope = current_account.clients
+    scope = @q.present? ? scope.search_all(@q) : scope.ordered
+    @pagy, @clients = pagy(scope, limit: 20)
   end
 
   def show
@@ -31,7 +34,7 @@ class ClientsController < ApplicationController
   def search
     query = params[:q].to_s.strip
     clients = if query.present?
-      current_account.clients.where("name ILIKE ? OR email ILIKE ? OR company ILIKE ?", "%#{query}%", "%#{query}%", "%#{query}%").limit(10)
+      current_account.clients.search_all(query).limit(10)
     else
       current_account.clients.ordered.limit(10)
     end

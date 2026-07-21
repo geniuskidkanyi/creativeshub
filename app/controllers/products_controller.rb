@@ -2,7 +2,10 @@ class ProductsController < ApplicationController
   before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @products = current_account.products.ordered
+    @q = params[:q].to_s.strip
+    scope = current_account.products
+    scope = @q.present? ? scope.search_all(@q) : scope.ordered
+    @pagy, @products = pagy(scope, limit: 20)
   end
 
   def show
@@ -45,7 +48,7 @@ class ProductsController < ApplicationController
   def search
     query = params[:q].to_s.strip
     products = if query.present?
-      current_account.products.where("name ILIKE ?", "%#{query}%").limit(10)
+      current_account.products.search_all(query).limit(10)
     else
       current_account.products.ordered.limit(10)
     end

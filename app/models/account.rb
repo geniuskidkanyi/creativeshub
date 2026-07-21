@@ -8,6 +8,8 @@ class Account < ApplicationRecord
   has_many :payouts, dependent: :destroy
   has_many :payments, dependent: :destroy
   has_many :qr_scans, dependent: :destroy
+  has_many :wave_imports, dependent: :destroy
+  has_many :recurring_invoices, dependent: :destroy
 
   validates :business_name, presence: true
 

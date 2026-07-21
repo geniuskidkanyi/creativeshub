@@ -1,0 +1,60 @@
+<div class="px-6 py-6 max-w-3xl">
+  <div class="mb-6">
+    <h1 class="text-2xl text-foreground" style="font-family: var(--font-display)">Import your data</h1>
+    <p class="text-sm text-muted-foreground mt-1">Moving from Wave? Upload your export files and we'll bring your customers, invoices and services across.</p>
+  </div>
+
+  <div class="bg-card border border-border rounded-lg p-5 mb-6">
+    <%= form_with model: @import, url: imports_path, html: { multipart: true } do |f| %>
+      <% if @import.errors.any? %>
+        <div class="rounded-md bg-destructive/10 border border-destructive/30 p-3 mb-4 text-sm text-destructive-foreground">
+          <%= @import.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <label class="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Export file (.csv)</label>
+      <%= f.file_field :file, accept: ".csv,text/csv", required: true,
+            class: "block w-full text-sm text-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80 file:transition-colors" %>
+
+      <div class="mt-4 flex items-center gap-3">
+        <%= f.submit "Upload and preview", class: "px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:brightness-110 transition-all cursor-pointer" %>
+        <span class="text-xs text-muted-foreground">Nothing is saved until you review the preview.</span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-card border border-border rounded-lg p-5 mb-6">
+    <h2 class="text-sm text-foreground font-medium mb-3">What we can import</h2>
+    <div class="space-y-2.5">
+      <% [
+        [ "customers.csv", "Your customer list — becomes Clients", true ],
+        [ "accounting.csv", "Invoices, line items and your services catalogue", true ],
+        [ "vendors.csv", "Suppliers — SmartPay doesn't track these yet", false ],
+        [ "bill_items.csv", "Bills you owe — SmartPay doesn't track these yet", false ]
+      ].each do |name, description, supported| %>
+        <div class="flex items-start gap-3 text-sm">
+          <span class="<%= supported ? "text-primary" : "text-muted-foreground" %> font-semibold mt-0.5"><%= supported ? "✓" : "—" %></span>
+          <div>
+            <span class="text-foreground font-medium"><%= name %></span>
+            <span class="text-muted-foreground">· <%= description %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @imports.any? %>
+    <h2 class="text-sm text-foreground font-medium mb-3">Recent imports</h2>
+    <div class="space-y-2">
+      <% @imports.each do |import| %>
+        <%= link_to import_path(import), class: "flex items-center justify-between bg-card border border-border rounded-lg px-4 py-3 hover:border-primary/40 transition-colors" do %>
+          <div class="min-w-0">
+            <div class="text-sm text-foreground truncate"><%= import.original_filename || "Upload" %></div>
+            <div class="text-xs text-muted-foreground"><%= import.label %> · <%= time_ago_in_words(import.created_at) %> ago</div>
+          </div>
+          <%= render "imports/status_badge", import: import %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
