@@ -110,13 +110,13 @@
 
       <div data-invoice-form-target="items">
         <%= f.fields_for :recurring_invoice_items do |item| %>
-          <%= render "recurring_invoices/item_fields", item: item, removable: item.object.persisted? %>
+          <%= render "recurring_invoices/item_fields", item: item %>
         <% end %>
       </div>
 
       <template data-invoice-form-target="template">
         <%= f.fields_for :recurring_invoice_items, RecurringInvoiceItem.new, child_index: "NEW_RECORD" do |item| %>
-          <%= render "recurring_invoices/item_fields", item: item, removable: true %>
+          <%= render "recurring_invoices/item_fields", item: item %>
         <% end %>
       </template>
 

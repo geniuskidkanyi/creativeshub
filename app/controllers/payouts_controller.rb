@@ -8,7 +8,7 @@ class PayoutsController < ApplicationController
   def new
     @available_balance = current_account.available_payout_balance
     @payout = current_account.payouts.new(
-      currency: current_account.currency.presence || "GMD",
+      currency: "GMD",
       network: current_account.settlement_code,
       account_number: current_account.settlement_account_number,
       beneficiary_name: current_account.business_name
@@ -47,7 +47,8 @@ class PayoutsController < ApplicationController
       beneficiary_name: @payout.beneficiary_name,
       narration: @payout.narration.presence || "SmartPay payout — #{current_account.business_name}",
       metadata: { payout_id: @payout.id, account_id: current_account.id },
-      idempotency_key: @payout.idempotency_key
+      idempotency_key: @payout.idempotency_key,
+      callback_url: modempay_webhook_url
     )
 
     if result.success?
@@ -68,7 +69,7 @@ class PayoutsController < ApplicationController
 
   def payout_params
     params.require(:payout).permit(:amount, :network, :account_number, :beneficiary_name, :narration)
-          .with_defaults(currency: current_account.currency.presence || "GMD")
+          .with_defaults(currency: "GMD")
   end
 
   def require_settlement_details!

@@ -198,7 +198,9 @@ class ModemPayService
 
   # POST /v1/transfers — sends a mobile money payout. The Idempotency-Key header
   # guarantees retries of the same request never produce a second transfer.
-  def create_transfer(amount:, currency: "GMD", network:, account_number:, beneficiary_name:, idempotency_key:, narration: nil, metadata: {})
+  # callback_url receives the transfer's status webhooks so the payout (and the
+  # user's remaining balance) updates without waiting for the dashboard webhook.
+  def create_transfer(amount:, currency: "GMD", network:, account_number:, beneficiary_name:, idempotency_key:, narration: nil, metadata: {}, callback_url: nil)
     body = {
       amount: amount,
       currency: currency,
@@ -208,6 +210,7 @@ class ModemPayService
     }
     body[:narration] = narration if narration.present?
     body[:metadata] = metadata.transform_values(&:to_s) if metadata.present?
+    body[:callback_url] = callback_url if callback_url.present?
 
     response = HTTParty.post(
       "#{BASE_URL}/v1/transfers",

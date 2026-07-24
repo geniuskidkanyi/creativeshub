@@ -86,8 +86,8 @@
             <div class="col-span-2 flex items-center pt-2">
               <% unless item_form.object.new_record? %>
                 <%= item_form.hidden_field :_destroy %>
-                <button type="button" data-action="invoice-form#remove" class="text-xs text-muted-foreground hover:text-destructive transition-colors">Remove</button>
               <% end %>
+              <button type="button" data-action="invoice-form#remove" class="text-xs text-muted-foreground hover:text-destructive transition-colors">Remove</button>
             </div>
           </div>
         <% end %>
