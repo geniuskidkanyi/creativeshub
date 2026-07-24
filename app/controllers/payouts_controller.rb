@@ -24,16 +24,8 @@ class PayoutsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    fee_result = ModemPayService.transfer_fee(amount: @payout.amount, currency: @payout.currency, network: @payout.network)
-    unless fee_result.success?
-      flash.now[:alert] = "Could not confirm the transfer fee: #{fee_result.error}"
-      return render :new, status: :unprocessable_entity
-    end
-
-    @payout.fee = fee_result.raw_response["fee"]
-
-    if @payout.total_debit > @available_balance
-      flash.now[:alert] = "Amount plus the D#{@payout.fee} transfer fee exceeds your available balance."
+    if @payout.amount > @available_balance
+      flash.now[:alert] = "Amount exceeds your available balance."
       return render :new, status: :unprocessable_entity
     end
 
@@ -55,7 +47,7 @@ class PayoutsController < ApplicationController
       @payout.update!(
         modempay_transfer_id: result.transfer_id,
         transfer_reference: result.transfer_reference,
-        fee: result.transfer_fee.presence || @payout.fee,
+        fee: result.transfer_fee,
         status: result.transfer_status == "completed" ? :completed : :pending
       )
       redirect_to payouts_path, notice: "Payout of D#{@payout.amount.to_i} sent to #{@payout.network.titleize} wallet #{@payout.account_number}."

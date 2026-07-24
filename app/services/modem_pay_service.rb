@@ -171,10 +171,6 @@ class ModemPayService
     new.fetch_balances
   end
 
-  def self.transfer_fee(amount:, currency: "GMD", network:)
-    new.transfer_fee(amount: amount, currency: currency, network: network)
-  end
-
   def self.create_transfer(**kwargs)
     new.create_transfer(**kwargs)
   end
@@ -182,17 +178,6 @@ class ModemPayService
   # GET /v1/balances → { payout_balance:, available_balance: }
   def fetch_balances
     response = HTTParty.get("#{BASE_URL}/v1/balances", headers: auth_headers, timeout: 30)
-    parse_plain_response(response)
-  end
-
-  # POST /v1/transfers/fees → { fee:, amount:, currency:, network: }
-  def transfer_fee(amount:, currency: "GMD", network:)
-    response = HTTParty.post(
-      "#{BASE_URL}/v1/transfers/fees",
-      headers: auth_headers,
-      body: { amount: numeric_amount(amount), currency: currency, network: network }.to_json,
-      timeout: 30
-    )
     parse_plain_response(response)
   end
 

@@ -17,10 +17,6 @@ class Payout < ApplicationRecord
   # failed payouts stop counting), so refresh the live balance cards.
   after_commit :broadcast_balance_refresh, on: [ :create, :update ]
 
-  def total_debit
-    amount + (fee || 0)
-  end
-
   private
 
   def broadcast_balance_refresh
