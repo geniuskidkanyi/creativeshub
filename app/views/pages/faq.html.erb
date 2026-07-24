@@ -1,0 +1,33 @@
+<%= render layout: "pages/page", locals: { title: "Frequently asked questions", subtitle: "Everything you need to know about getting paid with SmartPay." } do %>
+  <style>
+    .sp-faq { border:1px solid var(--border); border-radius:16px; background:var(--bg-card); margin-bottom:12px; overflow:hidden; }
+    .sp-faq summary { list-style:none; cursor:pointer; padding:18px 22px; font-weight:600; font-size:16px; color:var(--text); display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .sp-faq summary::-webkit-details-marker { display:none; }
+    .sp-faq summary::after { content:"+"; font-size:20px; color:var(--text-muted); flex-shrink:0; transition:transform .15s ease; }
+    .sp-faq[open] summary::after { transform:rotate(45deg); }
+    .sp-faq .sp-faq-a { padding:0 22px 18px; }
+    .sp-faq .sp-faq-a p { margin-bottom:0; }
+  </style>
+
+  <% [
+    ["What is SmartPay?", "SmartPay is a payment platform built for Gambian businesses and freelancers. You can send invoices, accept payments via Wave, Afrimoney, QMoney, APS, Visa, Mastercard and bank transfer, locally and across borders, and withdraw your balance whenever you like."],
+    ["Is the invoice generator really free?", "Yes, free forever. Unlimited invoices with your own logo and branding, in GMD or any major currency, with no monthly fee. Every invoice includes a built-in payment link."],
+    ["What does SmartPay cost?", "Using the platform is free, no monthly fees, no setup costs, no minimums. Payment processing fees are added to your customer's total at checkout, so the full invoice amount reaches your balance. SmartPay charges a flat 1% only when you request a payout."],
+    ["Which payment methods can my customers use?", "Wave, Afrimoney, QMoney, APS, Visa, Mastercard, bank transfer, and the USDC and USDT stablecoins. SmartPay-to-SmartPay transfers are free and instant."],
+    ["How fast do I get my money?", "Payments land in your SmartPay balance in seconds. Payout speed depends on the method: mobile money typically arrives in about 30 minutes, bank transfers the next day, and stablecoin payouts are instant."],
+    ["Do my clients need a SmartPay account to pay me?", "No. Clients simply open your invoice or payment link and pay with whichever method suits them, no signup required."],
+    ["Can I invoice international clients?", "Yes. You can invoice in any major currency, and international clients can pay by card. Funds are converted and settled to your balance automatically."],
+    ["How do I get started?", nil]
+  ].each do |q, a| %>
+    <details class="sp-faq">
+      <summary><%= q %></summary>
+      <div class="sp-faq-a">
+        <% if a %>
+          <p><%= a %></p>
+        <% else %>
+          <p><%= link_to "Create a free account", new_user_registration_path %>, setup takes about 3 minutes, with no paperwork. You can send your first invoice right away.</p>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+<% end %>

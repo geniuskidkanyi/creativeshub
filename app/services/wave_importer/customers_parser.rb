@@ -21,7 +21,7 @@ module WaveImporter
       rows = []
       seen = {}
 
-      CSV.foreach(@path, headers: true, encoding: FileDetector::ENCODING).with_index(2) do |csv_row, line|
+      FileDetector.table(@path).each.with_index(2) do |csv_row, line|
         name = squish(csv_row["customer_name"])
         next if name.blank?
 

@@ -3,23 +3,43 @@ class ProcessWaveImportJob < ApplicationJob
 
   # mode is :preview (dry run, writes nothing) or :commit.
   def perform(wave_import, mode:)
+    log_source(wave_import, mode)
     wave_import.update!(status: mode == :preview ? :previewing : :importing, error_message: nil)
 
     wave_import.with_downloaded_file do |path|
+      Rails.logger.info "[WaveImporter] import=#{wave_import.id} downloaded to=#{path} size_on_disk=#{File.size(path)}"
       mode == :preview ? run_preview(wave_import, path) : run_commit(wave_import, path)
     end
   rescue StandardError => e
-    Rails.logger.error "Wave import #{wave_import.id} failed: #{e.class}: #{e.message}"
+    Rails.logger.error "[WaveImporter] import=#{wave_import.id} FAILED #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     wave_import.update!(status: :failed, error_message: "#{e.class}: #{e.message}")
   end
 
   private
+
+  # One line describing the blob that was actually uploaded — filename,
+  # declared content type, stored byte size, checksum and which storage
+  # service it came from. Confirms the file reached the worker intact.
+  def log_source(wave_import, mode)
+    blob = wave_import.file.blob
+    Rails.logger.info(
+      "[WaveImporter] import=#{wave_import.id} mode=#{mode} account=#{wave_import.account_id} " \
+      "filename=#{blob&.filename.to_s.inspect} content_type=#{blob&.content_type.inspect} " \
+      "byte_size=#{blob&.byte_size} checksum=#{blob&.checksum.inspect} service=#{blob&.service_name}"
+    )
+  rescue StandardError => e
+    Rails.logger.warn "[WaveImporter] import=#{wave_import.id} could not read blob metadata: #{e.class}: #{e.message}"
+  end
 
   def run_preview(wave_import, path)
     detection = WaveImporter::FileDetector.detect(path)
     kind = detection[:kind]
 
     preview = WaveImporter::Previewer.new(wave_import.account, kind: kind, path: path).call
+    # Record the columns we actually read so an unrecognised file can be
+    # diagnosed (wrong delimiter, wrong export, garbled encoding) instead of
+    # being a dead end.
+    preview = preview.merge("detected_headers" => detection[:headers], "detect_error" => detection[:error])
     wave_import.update!(kind: kind, preview: preview, status: :previewed, previewed_at: Time.current)
   end
 

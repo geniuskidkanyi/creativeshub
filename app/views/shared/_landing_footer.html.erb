@@ -1,0 +1,62 @@
+<%# Shared footer for the landing page and static pages (about/terms/privacy/faq) %>
+<%
+footer_display = "'Bricolage Grotesque', sans-serif"
+%>
+<footer style="border-top:1px solid var(--border);background:var(--bg-footer)">
+  <div class="sp-footer-inner">
+    <div class="sp-footer-brand">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <%= image_tag "smart-pay-logo.png", alt: "SmartPay", class: "logo-light h-10 w-auto" %>
+        <%= image_tag "smart-logo-light.png", alt: "SmartPay", class: "logo-dark h-10 w-auto" %>
+      </div>
+      <p style="font-size:14px;line-height:1.6;color:var(--text-muted);max-width:280px">The payment platform built for Gambian businesses and freelancers. Get paid smartly.</p>
+    </div>
+
+    <div>
+      <div style="font-family:<%= footer_display %>;font-weight:700;font-size:14px;color:var(--text);margin-bottom:16px">Company</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <%= link_to "About", about_path, class: "sp-footer-link" %>
+        <%= link_to "FAQ", faq_path, class: "sp-footer-link" %>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:<%= footer_display %>;font-weight:700;font-size:14px;color:var(--text);margin-bottom:16px">Product</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <%= link_to "Free invoice generator", root_path(anchor: "invoice-generator"), class: "sp-footer-link" %>
+        <%= link_to "Pricing", root_path(anchor: "pricing"), class: "sp-footer-link" %>
+        <%= link_to "Payments", root_path(anchor: "payments"), class: "sp-footer-link" %>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:<%= footer_display %>;font-weight:700;font-size:14px;color:var(--text);margin-bottom:16px">Legal</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <%= link_to "Terms of service", terms_path, class: "sp-footer-link" %>
+        <%= link_to "Privacy policy", privacy_path, class: "sp-footer-link" %>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--border)">
+    <div class="sp-footer-bottom">
+      <span>© <%= Date.current.year %> SmartPay Ltd · Banjul, The Gambia</span>
+      <span style="display:flex;gap:20px">
+        <%= link_to "Terms", terms_path, class: "sp-footer-link" %>
+        <%= link_to "Privacy", privacy_path, class: "sp-footer-link" %>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .sp-footer-inner { max-width:1180px; margin:0 auto; padding:56px 40px 48px; display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:40px; }
+  .sp-footer-bottom { max-width:1180px; margin:0 auto; padding:22px 40px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--text-muted); }
+  .sp-footer-link { font-size:14px; color:var(--text-muted); text-decoration:none; transition:color .15s ease; }
+  .sp-footer-link:hover { color:var(--text); }
+  @media (max-width: 920px) {
+    .sp-footer-inner { grid-template-columns:1fr 1fr; padding:44px 24px 36px; gap:32px; }
+    .sp-footer-brand { grid-column:1 / -1; }
+    .sp-footer-bottom { padding:20px 24px; }
+  }
+</style>

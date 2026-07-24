@@ -1,0 +1,17 @@
+<%= render layout: "pages/page", locals: { title: "About SmartPay", subtitle: "The payment platform built for The Gambia." } do %>
+  <p>SmartPay was built to solve a simple problem: getting paid in The Gambia is harder than it should be. Businesses juggle cash, mobile money screenshots, and spreadsheets, and international clients have almost no easy way to pay a Gambian freelancer.</p>
+  <p>SmartPay brings it all together. One account that accepts <strong>Wave, Afrimoney, QMoney, APS, Visa, Mastercard and bank transfer</strong>, locally and across borders, with every payment automatically matched to the right invoice.</p>
+
+  <h2>What we believe</h2>
+  <ul>
+    <li><strong>Invoicing should be free.</strong> Our invoice generator is free forever, unlimited invoices, your own branding, no monthly fee.</li>
+    <li><strong>You should receive what you bill.</strong> Processing fees are added to your customer's total, so an invoice for D10,000 puts D10,000 in your balance.</li>
+    <li><strong>Fees should be simple.</strong> SmartPay charges a flat 1% only when you request a payout. Holding a balance costs nothing.</li>
+  </ul>
+
+  <h2>Who we serve</h2>
+  <p>From shops, restaurants and market vendors to freelance designers, developers and consultants, up to importers, exporters and NGOs, over 1,000 Gambian businesses use SmartPay to get paid.</p>
+
+  <h2>Where we are</h2>
+  <p>SmartPay Ltd is based in Banjul, The Gambia. Have a question? Check the <%= link_to "FAQ", faq_path %> or <%= link_to "create a free account", new_user_registration_path %> and see it for yourself, setup takes about 3 minutes.</p>
+<% end %>

@@ -1,0 +1,47 @@
+<%= render layout: "pages/page", locals: { title: "Terms of Service", subtitle: "Last updated: #{Date.new(2026, 7, 1).strftime('%B %-d, %Y')}" } do %>
+  <p>These Terms of Service ("Terms") govern your use of SmartPay, operated by SmartPay Ltd, Banjul, The Gambia ("SmartPay", "we", "us"). By creating an account or using our services, you agree to these Terms.</p>
+
+  <h2>1. The service</h2>
+  <p>SmartPay provides invoicing, payment collection and payout services for businesses and freelancers in The Gambia. We enable you to accept payments via mobile money (Wave, Afrimoney, QMoney), cards (Visa, Mastercard), APS, bank transfer and supported stablecoins, and to withdraw your balance to a payout method of your choice.</p>
+
+  <h2>2. Your account</h2>
+  <ul>
+    <li>You must be at least 18 years old and provide accurate, complete information when registering.</li>
+    <li>You are responsible for safeguarding your login credentials and for all activity under your account.</li>
+    <li>You must notify us immediately of any unauthorised use of your account.</li>
+  </ul>
+
+  <h2>3. Fees</h2>
+  <p>Creating an account and generating invoices is free. Payment processing fees are added to your customer's total at checkout, so the full invoice amount reaches your balance. SmartPay charges a flat <strong>1% fee when you request a payout</strong>. Current processing rates per payment method are published on our <%= link_to "pricing page", root_path(anchor: "pricing") %> and may change with notice.</p>
+
+  <h2>4. Payments and payouts</h2>
+  <ul>
+    <li>Funds from completed payments are credited to your SmartPay balance, typically within seconds.</li>
+    <li>Payout timing depends on the method chosen and is indicative, not guaranteed.</li>
+    <li>We may delay, withhold or reverse payouts where required by law, to investigate suspected fraud, or to handle disputed transactions.</li>
+  </ul>
+
+  <h2>5. Acceptable use</h2>
+  <p>You may not use SmartPay to collect payment for anything unlawful, fraudulent or deceptive, including money laundering, terrorist financing, counterfeit goods, or transactions you are not authorised to conduct. We may suspend or terminate accounts that violate this section.</p>
+
+  <h2>6. Your content</h2>
+  <p>You retain ownership of the logos, invoices and business data you upload. You grant us a licence to use that content solely to operate and improve the service. You are responsible for the accuracy of the invoices you send.</p>
+
+  <h2>7. Intellectual property</h2>
+  <p>SmartPay, its software, design and branding are the property of SmartPay Ltd. You may not copy, modify or reverse-engineer any part of the service.</p>
+
+  <h2>8. Disclaimers and liability</h2>
+  <p>The service is provided "as is". To the maximum extent permitted by law, SmartPay is not liable for indirect or consequential losses, and our total liability for any claim is limited to the fees you paid us in the 12 months before the claim arose. We are not a party to the underlying transaction between you and your customer.</p>
+
+  <h2>9. Termination</h2>
+  <p>You may close your account at any time after withdrawing your balance. We may suspend or terminate your account for breach of these Terms, with notice where practicable.</p>
+
+  <h2>10. Governing law</h2>
+  <p>These Terms are governed by the laws of the Republic of The Gambia, and disputes are subject to the exclusive jurisdiction of the Gambian courts.</p>
+
+  <h2>11. Changes</h2>
+  <p>We may update these Terms from time to time. Material changes will be announced in the app or by email; continued use of the service after changes take effect constitutes acceptance.</p>
+
+  <h2>12. Contact</h2>
+  <p>Questions about these Terms? See the <%= link_to "FAQ", faq_path %> or reach us at SmartPay Ltd, Banjul, The Gambia.</p>
+<% end %>

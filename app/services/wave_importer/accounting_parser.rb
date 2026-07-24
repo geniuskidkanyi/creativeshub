@@ -35,7 +35,7 @@ module WaveImporter
     private
 
     def read_rows
-      CSV.read(@path, headers: true, encoding: FileDetector::ENCODING)
+      FileDetector.table(@path)
     end
 
     def build_invoice(number, group)

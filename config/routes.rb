@@ -18,6 +18,11 @@ Rails.application.routes.draw do
   root "landing#show"
   get "dashboard", to: "dashboard#show", as: :dashboard
 
+  get "about",   to: "pages#about",   as: :about
+  get "terms",   to: "pages#terms",   as: :terms
+  get "privacy", to: "pages#privacy", as: :privacy
+  get "faq",     to: "pages#faq",     as: :faq
+
   resource :account, only: [ :new, :create, :edit, :update ]
 
   resources :clients do

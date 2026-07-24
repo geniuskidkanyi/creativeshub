@@ -98,26 +98,11 @@ mono = "'Geist Mono', monospace"
         </div>
       </div>
 
-      <%# hero revenue card %>
-      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:26px;box-shadow:0 30px 70px -30px rgba(var(--primary-rgb),0.4)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:13px;color:var(--text-muted);font-weight:600">Revenue · <%= Date.current.strftime("%b %Y") %></span>
-          <span style="font-size:12px;font-weight:600;color:var(--primary);background:rgba(var(--primary-rgb),0.12);padding:4px 9px;border-radius:7px">↑ 18.4%</span>
-        </div>
-        <div style="font-family:<%= display %>;font-weight:700;font-size:40px;color:var(--text);letter-spacing:-.02em">D142,800</div>
-        <div style="display:flex;align-items:flex-end;gap:7px;height:120px;margin:22px 0 14px">
-          <% [40, 55, 48, 62, 58, 70, 66, 78, 72, 85, 80, 95].each_with_index do |h, idx| %>
-            <div style="flex:1;height:<%= h %>%;border-radius:6px 6px 3px 3px;background:<%= idx > 9 ? 'var(--primary)' : 'rgba(var(--primary-rgb),0.3)' %>;transform-origin:bottom;animation:spGrow .5s <%= idx * 0.03 %>s ease both"></div>
-          <% end %>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          <% [["Wave", "D64k", 155], ["Visa", "D38k", 265], ["Afrimoney", "D40k", 55]].each do |name, amt, hue| %>
-            <div style="background:var(--bg-alt);border-radius:12px;padding:12px">
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-bottom:4px"><span style="width:9px;height:9px;border-radius:99px;background:oklch(.6 .13 <%= hue %>);flex-shrink:0"></span><%= name %></div>
-              <div style="font-weight:700;font-size:17px;color:var(--text)"><%= amt %></div>
-            </div>
-          <% end %>
-        </div>
+      <%# hero invoice generator card %>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:26px 26px 30px;box-shadow:0 30px 70px -30px rgba(var(--primary-rgb),0.4);text-align:center">
+        <%= image_tag "free_invoice_generator.png", class: "w-full h-auto", style: "max-width:420px;margin:0 auto" %>
+        <div style="font-family:<%= display %>;font-weight:800;font-size:clamp(26px,2.6vw,34px);letter-spacing:-.01em;color:var(--text);margin-top:10px">FREE <span style="color:#F5B301">Invoice Generator</span></div>
+        <p style="font-size:14px;color:var(--text-muted);margin-top:6px">Generate professional invoices in seconds with built-in payment links.</p>
       </div>
     </section>
 
@@ -294,6 +279,6 @@ mono = "'Geist Mono', monospace"
       </div>
     </section>
 
-    <footer style="border-top:1px solid var(--border);padding:40px;text-align:center;color:var(--text-muted);font-size:13px">© <%= Date.current.year %> SmartPay Ltd · Banjul, The Gambia</footer>
+    <%= render "shared/landing_footer" %>
   </div>
 </div>

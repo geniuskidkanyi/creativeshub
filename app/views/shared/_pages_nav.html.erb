@@ -1,0 +1,13 @@
+<%# Simple fixed nav for static pages (about/terms/privacy/faq) %>
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--nav-border)">
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;justify-content:space-between">
+    <%= link_to root_path, style: "display:flex;align-items:center;gap:10px" do %>
+      <%= image_tag "smart-pay-logo.png", alt: "SmartPay", class: "logo-light h-12 w-auto" %>
+      <%= image_tag "smart-logo-light.png", alt: "SmartPay", class: "logo-dark h-12 w-auto" %>
+    <% end %>
+    <div style="display:flex;align-items:center;gap:14px">
+      <%= link_to "Sign in", new_user_session_path, style: "font-size:14px;color:var(--nav-link);text-decoration:none;font-weight:500" %>
+      <%= link_to "Get started →", new_user_registration_path, style: "padding:10px 20px;border-radius:11px;background:var(--primary);color:var(--primary-ink);font-size:14px;font-weight:600;text-decoration:none" %>
+    </div>
+  </div>
+</nav>

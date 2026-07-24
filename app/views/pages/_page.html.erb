@@ -1,0 +1,27 @@
+<%# Shared shell for static pages — used via render(layout: "pages/page") with a content block %>
+<%
+display = "'Bricolage Grotesque', sans-serif"
+body_font = "'Hanken Grotesk', system-ui, sans-serif"
+%>
+<style>
+  .sp-page { max-width:760px; margin:0 auto; padding:150px 24px 90px; }
+  .sp-page h1 { font-family:<%= display %>; font-weight:800; font-size:clamp(36px,5vw,54px); letter-spacing:-.02em; line-height:1.05; color:var(--text); margin-bottom:14px; }
+  .sp-page .sp-page-sub { font-size:16px; color:var(--text-muted); margin-bottom:48px; }
+  .sp-page h2 { font-family:<%= display %>; font-weight:700; font-size:22px; letter-spacing:-.01em; color:var(--text); margin:42px 0 14px; }
+  .sp-page p { font-size:15.5px; line-height:1.7; color:var(--text-dim); margin-bottom:14px; }
+  .sp-page ul { margin:0 0 14px 20px; }
+  .sp-page li { font-size:15.5px; line-height:1.7; color:var(--text-dim); margin-bottom:8px; }
+  .sp-page a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .sp-page strong { color:var(--text); }
+</style>
+<div style="font-family:<%= body_font %>;background:var(--bg);min-height:100vh">
+  <%= render "shared/pages_nav" %>
+  <main class="sp-page">
+    <h1><%= title %></h1>
+    <% if local_assigns[:subtitle].present? %>
+      <p class="sp-page-sub"><%= subtitle %></p>
+    <% end %>
+    <%= yield %>
+  </main>
+  <%= render "shared/landing_footer" %>
+</div>

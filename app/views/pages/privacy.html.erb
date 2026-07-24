@@ -1,0 +1,37 @@
+<%= render layout: "pages/page", locals: { title: "Privacy Policy", subtitle: "Last updated: #{Date.new(2026, 7, 1).strftime('%B %-d, %Y')}" } do %>
+  <p>This Privacy Policy explains how SmartPay Ltd ("SmartPay", "we", "us") collects, uses and protects your information when you use our services.</p>
+
+  <h2>1. Information we collect</h2>
+  <ul>
+    <li><strong>Account information</strong>, your name, email address, business name and branding when you register.</li>
+    <li><strong>Invoice and client data</strong>, the clients, products and invoices you create in the app.</li>
+    <li><strong>Transaction data</strong>, payment amounts, methods, payer details and payout requests needed to process payments.</li>
+    <li><strong>Technical data</strong>, device, browser and usage information collected automatically to keep the service secure and reliable.</li>
+  </ul>
+
+  <h2>2. How we use it</h2>
+  <ul>
+    <li>To provide the service: generating invoices, processing payments, matching payments to invoices and executing payouts.</li>
+    <li>To prevent fraud, money laundering and abuse, and to comply with legal obligations in The Gambia.</li>
+    <li>To communicate with you about your account, payments and service changes.</li>
+    <li>To improve the product. We do not sell your personal data.</li>
+  </ul>
+
+  <h2>3. Sharing</h2>
+  <p>We share data only where necessary to operate the service: with payment processors and mobile-money or card networks to complete transactions, with service providers who host our infrastructure, and with authorities where the law requires it. Your clients see only what appears on the invoices you send them.</p>
+
+  <h2>4. Security</h2>
+  <p>Data is encrypted in transit, and access to production systems is restricted to authorised personnel. No system is perfectly secure, protect your login credentials and contact us immediately if you suspect unauthorised access.</p>
+
+  <h2>5. Retention</h2>
+  <p>We keep your data for as long as your account is active, and afterwards only as long as needed for legal, tax and anti-fraud obligations, after which it is deleted or anonymised.</p>
+
+  <h2>6. Your rights</h2>
+  <p>You can access and update your account information in the app at any time. You may request a copy of your data or ask us to delete your account and associated personal data, subject to records we must keep by law.</p>
+
+  <h2>7. Cookies</h2>
+  <p>We use only the cookies necessary to keep you signed in and secure the service. We do not use third-party advertising cookies.</p>
+
+  <h2>8. Changes and contact</h2>
+  <p>We may update this policy from time to time; material changes will be announced in the app or by email. Questions? See the <%= link_to "FAQ", faq_path %> or write to SmartPay Ltd, Banjul, The Gambia.</p>
+<% end %>

@@ -63,9 +63,25 @@
     </div>
 
   <% elsif @import.previewed? && !@import.supported? %>
+    <% detected = @import.preview["detected_headers"].to_a %>
     <div class="rounded-lg bg-card border border-border p-5">
-      <p class="text-sm text-foreground font-medium mb-1">We can't import this file yet</p>
-      <p class="text-sm text-muted-foreground">SmartPay tracks money coming in — customers, invoices and payments. Vendor and bill exports cover money going out, which isn't supported yet.</p>
+      <% if @import.kind.blank? %>
+        <p class="text-sm text-foreground font-medium mb-1">We couldn't recognise this file</p>
+        <p class="text-sm text-muted-foreground mb-3">Upload the CSV exactly as exported from Wave (Customers, or the Accounting transactions export). We look for columns like <span class="font-mono text-xs">customer_name</span> or <span class="font-mono text-xs">Transaction ID</span>.</p>
+        <% if detected.any? %>
+          <div class="rounded-md bg-muted/40 border border-border p-3">
+            <p class="text-xs text-muted-foreground mb-1.5">Columns we read from your file:</p>
+            <p class="text-xs font-mono text-foreground break-words"><%= detected.first(12).join(" · ") %><%= " …" if detected.size > 12 %></p>
+          </div>
+        <% elsif @import.preview["detect_error"].present? %>
+          <p class="text-xs text-destructive font-mono">Read error: <%= @import.preview["detect_error"] %></p>
+        <% else %>
+          <p class="text-xs text-muted-foreground">The file appears to be empty.</p>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-foreground font-medium mb-1">We can't import this file yet</p>
+        <p class="text-sm text-muted-foreground">SmartPay tracks money coming in — customers, invoices and payments. Vendor and bill exports cover money going out, which isn't supported yet.</p>
+      <% end %>
     </div>
 
   <% else %>
