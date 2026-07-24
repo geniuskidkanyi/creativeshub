@@ -190,7 +190,7 @@ class ModemPayService
     response = HTTParty.post(
       "#{BASE_URL}/v1/transfers/fees",
       headers: auth_headers,
-      body: { amount: amount, currency: currency, network: network }.to_json,
+      body: { amount: numeric_amount(amount), currency: currency, network: network }.to_json,
       timeout: 30
     )
     parse_plain_response(response)
@@ -202,7 +202,7 @@ class ModemPayService
   # user's remaining balance) updates without waiting for the dashboard webhook.
   def create_transfer(amount:, currency: "GMD", network:, account_number:, beneficiary_name:, idempotency_key:, narration: nil, metadata: {}, callback_url: nil)
     body = {
-      amount: amount,
+      amount: numeric_amount(amount),
       currency: currency,
       network: network,
       account_number: account_number,
@@ -222,6 +222,14 @@ class ModemPayService
   end
 
   private
+
+  # BigDecimal (the type of decimal DB columns) serializes to a JSON *string*,
+  # which Modem Pay rejects with "Invalid transfer amount" — send a plain JSON
+  # number: an integer for whole amounts, a float otherwise.
+  def numeric_amount(amount)
+    decimal = amount.to_d
+    decimal.frac.zero? ? decimal.to_i : decimal.to_f
+  end
 
   def auth_headers
     {
