@@ -31,7 +31,14 @@
           </span>
           <span data-clipboard-target="label">Copy Link</span>
         </button>
-        <% unless @invoice.paid? %>
+        <% if @invoice.paid? %>
+          <% if @invoice.payments.succeeded.none? %>
+            <%# Only a manual mark-as-paid can be reversed; real online payments can't. %>
+            <%= button_to "Mark as unpaid", mark_unpaid_invoice_path(@invoice), method: :post,
+                  form: { data: { turbo_confirm: "Mark this invoice as unpaid?" } },
+                  class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors cursor-pointer" %>
+          <% end %>
+        <% else %>
           <%= link_to "Edit", edit_invoice_path(@invoice), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" %>
           <% if @invoice.draft? %>
             <%= link_to "Mark as Sent", send_invoice_invoice_path(@invoice), data: { turbo_method: :post }, class: "inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors" %>
@@ -41,11 +48,6 @@
             Mark as paid
           </button>
           <%= link_to "Accept Payment", pay_invoice_path(@invoice), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:brightness-110 transition-all" %>
-        <% elsif @invoice.payments.succeeded.none? %>
-          <%# Only a manual mark-as-paid can be reversed; real online payments can't. %>
-          <%= button_to "Mark as unpaid", mark_unpaid_invoice_path(@invoice), method: :post,
-                form: { data: { turbo_confirm: "Mark this invoice as unpaid?" } },
-                class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors cursor-pointer" %>
         <% end %>
 
         <%# Off-platform payment capture (cash, bank transfer, …). %>
