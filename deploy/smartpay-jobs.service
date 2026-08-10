@@ -1,33 +1,29 @@
 # SolidQueue worker for SmartPay — the process that actually runs background
-# jobs (imports, emails, recurring invoices, notifications). Mirrors the
-# hand-managed smartpay-puma unit.
+# jobs (imports, emails, recurring invoices, notifications).
 #
-# ── One-time server setup (as a sudo-capable user) ──────────────────────────
-#   sudo cp /home/deploy/smartpay/current/deploy/smartpay-jobs.service \
-#           /etc/systemd/system/smartpay-jobs.service
-#   sudo systemctl daemon-reload
-#   sudo systemctl enable --now smartpay-jobs
-#   sudo systemctl status smartpay-jobs          # confirm "active (running)"
+# This is a systemd *user* unit (managed with `systemctl --user`, no sudo),
+# living at ~/.config/systemd/user/smartpay-jobs.service for the deploy user.
 #
-# ── Passwordless sudo for the deploy user (so Capistrano can restart it) ─────
-#   Add to /etc/sudoers.d/smartpay (mirror the existing smartpay-puma line):
-#   deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl start smartpay-jobs, \
-#     /usr/bin/systemctl stop smartpay-jobs, /usr/bin/systemctl restart smartpay-jobs
+# ── One-time setup (as the deploy user) ─────────────────────────────────────
+#   mkdir -p ~/.config/systemd/user
+#   cp ~/smartpay/current/deploy/smartpay-jobs.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now smartpay-jobs
+#   systemctl --user status smartpay-jobs           # want: active (running)
 #
-# Do the above BEFORE the next deploy — the `after deploy:finished` hook runs
-# `sudo -n systemctl restart smartpay-jobs`, which fails loudly if the unit or
-# sudoers rule is missing.
+# ── Enable linger (one-time, needs sudo once) ───────────────────────────────
+# Without this the user's services stop when the SSH session ends and never
+# start at boot:
+#   sudo loginctl enable-linger deploy
+#
+# No sudoers rule is needed — Capistrano restarts it with `systemctl --user`.
 
 [Unit]
 Description=SmartPay SolidQueue worker (bin/jobs)
 After=network.target
-# If PostgreSQL runs on this same host, also gate on it:
-# After=network.target postgresql.service
 
 [Service]
 Type=simple
-User=deploy
-Group=deploy
 
 # Runs from the Capistrano `current` symlink so each restart picks up the
 # newest release. Secrets come from the symlinked config/master.key,
@@ -46,4 +42,5 @@ KillSignal=SIGTERM
 TimeoutStopSec=30
 
 [Install]
-WantedBy=multi-user.target
+# User-service target (not multi-user.target).
+WantedBy=default.target

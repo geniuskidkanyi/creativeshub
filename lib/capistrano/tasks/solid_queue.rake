@@ -1,32 +1,25 @@
-# Manages the SolidQueue worker (bin/jobs) via systemd, mirroring the puma
-# tasks in config/deploy.rb. Requires a `smartpay-jobs` systemd unit on the
-# server and passwordless sudo for `systemctl {start,stop,restart}
-# smartpay-jobs` by the deploy user (same as smartpay-puma).
+# Manages the SolidQueue worker (bin/jobs) as a systemd *user* service
+# (~/.config/systemd/user/smartpay-jobs.service on the deploy user), restarting
+# it on each deploy so it picks up new code.
 #
 # Without a running worker, ActiveJob just enqueues into SolidQueue and nothing
 # ever runs: imports never preview, emails never send, recurring invoices never
-# generate. This keeps the worker alive and picking up new code on each deploy.
+# generate.
+#
+# Uses `systemctl --user` (no sudo). Over a non-login SSH session the user bus
+# isn't wired up automatically, so XDG_RUNTIME_DIR must point at the user's
+# runtime dir — which exists because linger is enabled
+# (`sudo loginctl enable-linger deploy`, done once during setup).
 namespace :solid_queue do
-  # sudo -n: never prompt — fail loudly if passwordless sudo isn't set up
-  # rather than hanging the deploy on an invisible password prompt.
-  desc "Start the SolidQueue worker via systemd"
-  task :start do
-    on roles(:app) do
-      execute :sudo, "-n", :systemctl, :start, "smartpay-jobs"
-    end
-  end
-
-  desc "Stop the SolidQueue worker via systemd"
-  task :stop do
-    on roles(:app) do
-      execute :sudo, "-n", :systemctl, :stop, "smartpay-jobs"
-    end
-  end
-
-  desc "Restart the SolidQueue worker via systemd"
-  task :restart do
-    on roles(:app) do
-      execute :sudo, "-n", :systemctl, :restart, "smartpay-jobs"
+  %i[start stop restart status].each do |action|
+    desc "#{action.to_s.capitalize} the SolidQueue worker (systemd --user)"
+    task action do
+      on roles(:app) do
+        uid = capture(:id, "-u").strip
+        with xdg_runtime_dir: "/run/user/#{uid}" do
+          execute :systemctl, "--user", action.to_s, "smartpay-jobs"
+        end
+      end
     end
   end
 end
