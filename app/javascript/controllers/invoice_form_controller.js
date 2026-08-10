@@ -33,9 +33,11 @@ export default class extends Controller {
     if (!last) return
 
     const desc = last.querySelector("input[name*='[description]']")
+    const details = last.querySelector("[name*='[details]']")
     const qty = last.querySelector("input[name*='[quantity]']")
     const price = last.querySelector("input[name*='[unit_price]']")
     if (desc) desc.value = product.name
+    if (details && product.description) details.value = product.description
     if (qty) qty.value = 1
     if (price) price.value = parseFloat(product.unit_price).toFixed(0)
     // Values are set programmatically, which fires no input event — announce

@@ -1,5 +1,5 @@
 class InvoicesController < ApplicationController
-  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :pay, :send_invoice ]
+  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :pay, :send_invoice, :mark_paid, :mark_unpaid ]
 
   def index
     @q = params[:q].to_s.strip
@@ -72,6 +72,34 @@ class InvoicesController < ApplicationController
     redirect_to @invoice, notice: "Invoice marked as sent and emailed to client."
   end
 
+  # Records an invoice settled off-platform (cash, bank transfer, cheque…).
+  # Deliberately creates no Payment record: that money never came through Modem
+  # Pay, so it must not count toward the withdrawable payout balance. It still
+  # shows as paid revenue (the dashboard totals are invoice-based).
+  def mark_paid
+    if @invoice.paid?
+      return redirect_to @invoice, alert: "This invoice is already paid."
+    end
+
+    method = params.dig(:invoice, :payment_method).presence || "Manual"
+    paid_at = parse_paid_at(params.dig(:invoice, :paid_date))
+
+    @invoice.calculate_totals
+    @invoice.mark_as_paid!(method: method, paid_at: paid_at)
+    redirect_to @invoice, notice: "Invoice marked as paid (#{method})."
+  end
+
+  # Reverses a manual mark-as-paid. Blocked when a real Modem Pay payment
+  # exists, so a genuine online payment can't be silently undone.
+  def mark_unpaid
+    if @invoice.payments.succeeded.exists?
+      return redirect_to @invoice, alert: "This invoice was paid online and can't be marked unpaid."
+    end
+
+    @invoice.update!(status: :sent, paid_date: nil, payment_method: nil)
+    redirect_to @invoice, notice: "Invoice marked as unpaid."
+  end
+
   def pay
     if @invoice.paid?
       return redirect_to @invoice, alert: "Invoice is already paid."
@@ -130,10 +158,20 @@ class InvoicesController < ApplicationController
     @invoice = current_account.invoices.find_by!(uuid: params[:id])
   end
 
+  # A date from the form (yyyy-mm-dd) or today; never trusts the input to be
+  # parseable.
+  def parse_paid_at(value)
+    return Time.current if value.blank?
+
+    Time.zone.parse(value.to_s) || Time.current
+  rescue ArgumentError
+    Time.current
+  end
+
   def invoice_params
     params.require(:invoice).permit(
       :client_id, :status, :issue_date, :due_date, :tax_rate, :notes, :currency, :fx_rate,
-      invoice_items_attributes: [ :id, :description, :quantity, :unit_price, :_destroy ]
+      invoice_items_attributes: [ :id, :description, :details, :quantity, :unit_price, :_destroy ]
     )
   end
 end

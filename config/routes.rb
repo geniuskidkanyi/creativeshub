@@ -39,6 +39,8 @@ Rails.application.routes.draw do
     member do
       get :pay
       post :send_invoice
+      post :mark_paid
+      post :mark_unpaid
     end
   end
 

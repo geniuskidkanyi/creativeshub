@@ -267,7 +267,12 @@
           <tbody>
             <% @invoice.invoice_items.each do |item| %>
               <tr>
-                <td class="desc"><p class="item-desc"><%= item.description %></p></td>
+                <td class="desc">
+                  <p class="item-desc"><%= item.description %></p>
+                  <% if item.details.present? %>
+                    <p style="font-size:12px;color:#666;margin-top:2px"><%= simple_format(item.details, {}, wrapper_tag: "span") %></p>
+                  <% end %>
+                </td>
                 <td class="num"><p class="item-mono"><%= item.quantity %></p></td>
                 <td class="rate"><p class="item-mono"><%= @invoice.currency_symbol %><%= number_with_precision(item.unit_price, precision: 0) %></p></td>
                 <td class="amount"><p class="item-mono-bold"><%= @invoice.currency_symbol %><%= number_with_precision(item.amount, precision: 0) %></p></td>

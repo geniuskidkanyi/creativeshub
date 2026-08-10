@@ -6,6 +6,6 @@ class RecurringInvoiceItem < ApplicationRecord
   validates :unit_price, presence: true, numericality: true
 
   def to_invoice_item_attributes
-    { description: description, quantity: quantity, unit_price: unit_price }
+    { description: description, details: details, quantity: quantity, unit_price: unit_price }
   end
 end

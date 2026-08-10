@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_014711) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_134454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -81,6 +81,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_014711) do
     t.decimal "amount"
     t.datetime "created_at", null: false
     t.string "description"
+    t.text "details"
     t.bigint "invoice_id", null: false
     t.decimal "quantity"
     t.decimal "unit_price"
@@ -207,6 +208,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_014711) do
   create_table "recurring_invoice_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "description"
+    t.text "details"
     t.integer "position", default: 0
     t.decimal "quantity", default: "1.0"
     t.bigint "recurring_invoice_id", null: false

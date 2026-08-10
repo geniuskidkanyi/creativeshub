@@ -1,22 +1,28 @@
-<div data-invoice-item class="grid grid-cols-12 gap-2 mb-2 items-start">
-  <div class="col-span-6">
-    <%= item.text_field :description, placeholder: "Description",
-          class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+<div data-invoice-item class="mb-2">
+  <div class="grid grid-cols-12 gap-2 items-start">
+    <div class="col-span-6">
+      <%= item.text_field :description, placeholder: "Item",
+            class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+    </div>
+    <div class="col-span-2">
+      <%= item.number_field :quantity, placeholder: "Qty", step: "any", min: "0", value: item.object.quantity || 1,
+            class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+    </div>
+    <div class="col-span-3">
+      <%= item.number_field :unit_price, placeholder: "Price", step: "any",
+            class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+    </div>
+    <div class="col-span-1 flex items-center pt-2">
+      <% if item.object.persisted? %>
+        <%= item.hidden_field :_destroy %>
+      <% end %>
+      <button type="button" data-action="invoice-form#remove" class="text-muted-foreground hover:text-destructive transition-colors" title="Remove">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
-  <div class="col-span-2">
-    <%= item.number_field :quantity, placeholder: "Qty", step: "any", min: "0", value: item.object.quantity || 1,
-          class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
-  </div>
-  <div class="col-span-3">
-    <%= item.number_field :unit_price, placeholder: "Price", step: "any",
-          class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
-  </div>
-  <div class="col-span-1 flex items-center pt-2">
-    <% if item.object.persisted? %>
-      <%= item.hidden_field :_destroy %>
-    <% end %>
-    <button type="button" data-action="invoice-form#remove" class="text-muted-foreground hover:text-destructive transition-colors" title="Remove">
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+  <div class="mt-1.5 pr-[calc(1/12*100%)]">
+    <%= item.text_field :details, placeholder: "Add a description (optional)",
+          class: "w-full rounded-md border border-border/60 bg-input-background text-muted-foreground placeholder:text-muted-foreground/70 px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary" %>
   </div>
 </div>

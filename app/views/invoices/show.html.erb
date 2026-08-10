@@ -12,8 +12,11 @@
           </span>
         </div>
         <p class="text-sm text-muted-foreground mt-1"><%= @invoice.client.name %></p>
+        <% if @invoice.paid? && @invoice.payment_method.present? %>
+          <p class="text-xs text-primary mt-0.5">Paid via <%= @invoice.payment_method.humanize %><%= " on #{@invoice.paid_date.to_date.to_fs(:long)}" if @invoice.paid_date %></p>
+        <% end %>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" data-controller="modal">
         <%= link_to invoice_path(@invoice, format: :pdf), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" do %>
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           PDF
@@ -33,8 +36,41 @@
           <% if @invoice.draft? %>
             <%= link_to "Mark as Sent", send_invoice_invoice_path(@invoice), data: { turbo_method: :post }, class: "inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors" %>
           <% end %>
+          <button type="button" data-action="modal#open" class="inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Mark as paid
+          </button>
           <%= link_to "Accept Payment", pay_invoice_path(@invoice), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:brightness-110 transition-all" %>
+        <% elsif @invoice.payments.succeeded.none? %>
+          <%# Only a manual mark-as-paid can be reversed; real online payments can't. %>
+          <%= button_to "Mark as unpaid", mark_unpaid_invoice_path(@invoice), method: :post,
+                form: { data: { turbo_confirm: "Mark this invoice as unpaid?" } },
+                class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors cursor-pointer" %>
         <% end %>
+
+        <%# Off-platform payment capture (cash, bank transfer, …). %>
+        <div data-modal-target="panel" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" data-action="click->modal#closeBackground">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+          <div class="relative bg-card border border-border rounded-lg w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-sm text-foreground font-medium mb-1">Mark as paid</h3>
+            <p class="text-xs text-muted-foreground mb-4">Record a payment made outside SmartPay. This marks the invoice paid but doesn't add to your payout balance — the money isn't in your SmartPay wallet.</p>
+            <%= form_with url: mark_paid_invoice_path(@invoice), method: :post do %>
+              <label class="block text-xs text-muted-foreground uppercase tracking-wider mb-1.5">Payment method</label>
+              <select name="invoice[payment_method]" class="w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm mb-3">
+                <% [ "Cash", "Bank transfer", "Mobile money", "Cheque", "Other" ].each do |method| %>
+                  <option value="<%= method %>"><%= method %></option>
+                <% end %>
+              </select>
+              <label class="block text-xs text-muted-foreground uppercase tracking-wider mb-1.5">Payment date</label>
+              <input type="date" name="invoice[paid_date]" value="<%= Date.current %>" max="<%= Date.current %>"
+                     class="w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm mb-5">
+              <div class="flex gap-2">
+                <button type="button" data-action="modal#close" class="flex-1 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-sm">Cancel</button>
+                <button type="submit" class="flex-1 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-pointer">Mark as paid</button>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -95,7 +131,12 @@
         <tbody class="divide-y divide-border">
           <% @invoice.invoice_items.each do |item| %>
             <tr>
-              <td class="py-3 text-sm text-foreground"><%= item.description %></td>
+              <td class="py-3 text-sm text-foreground">
+                <%= item.description %>
+                <% if item.details.present? %>
+                  <span class="block text-xs text-muted-foreground mt-0.5"><%= simple_format(item.details, {}, wrapper_tag: "span") %></span>
+                <% end %>
+              </td>
               <td class="py-3 text-sm text-foreground text-right"><%= item.quantity %></td>
               <td class="py-3 text-sm text-foreground text-right"><%= @invoice.currency_symbol %><%= number_with_precision(item.unit_price, precision: 0) %></td>
               <td class="py-3 text-sm text-foreground text-right font-medium"><%= @invoice.currency_symbol %><%= number_with_precision(item.amount, precision: 0) %></td>

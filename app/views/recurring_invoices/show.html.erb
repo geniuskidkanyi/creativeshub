@@ -37,8 +37,13 @@
     <div class="px-4 py-3 border-b border-border text-sm text-foreground font-medium">Line items</div>
     <div class="divide-y divide-border">
       <% @recurring_invoice.recurring_invoice_items.each do |item| %>
-        <div class="px-4 py-2.5 flex items-center justify-between gap-3">
-          <span class="text-sm text-foreground truncate"><%= item.description %></span>
+        <div class="px-4 py-2.5 flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <span class="block text-sm text-foreground truncate"><%= item.description %></span>
+            <% if item.details.present? %>
+              <span class="block text-xs text-muted-foreground truncate"><%= item.details %></span>
+            <% end %>
+          </div>
           <span class="text-sm text-muted-foreground shrink-0"><%= item.quantity.to_f %> × <%= @recurring_invoice.currency_symbol %><%= number_with_delimiter(item.unit_price) %></span>
         </div>
       <% end %>

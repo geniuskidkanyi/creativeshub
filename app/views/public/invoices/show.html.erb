@@ -67,7 +67,12 @@
         <tbody class="divide-y divide-border">
           <% @invoice.invoice_items.each do |item| %>
             <tr>
-              <td class="py-2 text-sm text-foreground"><%= item.description %></td>
+              <td class="py-2 text-sm text-foreground">
+                <%= item.description %>
+                <% if item.details.present? %>
+                  <span class="block text-xs text-muted-foreground mt-0.5"><%= simple_format(item.details, {}, wrapper_tag: "span") %></span>
+                <% end %>
+              </td>
               <td class="py-2 text-sm text-foreground text-right"><%= item.quantity %></td>
               <td class="py-2 text-sm text-foreground text-right"><%= @invoice.currency_symbol %><%= number_with_precision(item.unit_price, precision: 0) %></td>
               <td class="py-2 text-sm text-foreground text-right font-medium"><%= @invoice.currency_symbol %><%= number_with_precision(item.amount, precision: 0) %></td>
