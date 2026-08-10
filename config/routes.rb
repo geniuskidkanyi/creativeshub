@@ -48,6 +48,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications, only: [ :index ] do
+    member { patch :read }
+    collection { patch :read_all }
+  end
+
   resources :recurring_invoices do
     member do
       post :pause

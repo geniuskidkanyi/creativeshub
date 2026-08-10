@@ -45,6 +45,11 @@ class Account < ApplicationRecord
     [ total_earnings - total_paid_out, 0 ].max
   end
 
+  # Who receives this account's notifications — everyone with access.
+  def notification_recipients
+    users.to_a
+  end
+
   # Live figures: dashboard and payout pages subscribe with
   # turbo_stream_from(account); these push refreshed partials over Action
   # Cable whenever money moves. Targets missing from the open page are

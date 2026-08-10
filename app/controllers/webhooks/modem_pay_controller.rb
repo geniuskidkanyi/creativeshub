@@ -80,6 +80,9 @@ module Webhooks
         transfer_reference: payload["transfer_reference"].presence || payout.transfer_reference,
         webhook_data: payload
       )
+
+      # completed / failed / flagged are all outcomes the business needs to know.
+      notify_owners(PayoutStatusNotifier.with(payout: payout), payout.account)
     end
 
     def find_payout(payload)
@@ -98,6 +101,11 @@ module Webhooks
         paid_at: payload["updatedAt"] || Time.current,
         webhook_data: payload
       )
+
+      # Notify the business that money came in — for invoice and QR payments
+      # alike (QR payments are anonymous, so the owner is the only recipient).
+      notify_owners(PaymentReceivedNotifier.with(payment: payment), payment.account)
+
       return if payment.qr_payment?
 
       payment.invoice.mark_as_paid!(method: :payment_request, paid_at: payment.paid_at)
@@ -116,6 +124,11 @@ module Webhooks
       return nil unless payment_id
 
       Payment.find_by(id: payment_id)
+    end
+
+    def notify_owners(notifier, account)
+      recipients = account&.notification_recipients
+      notifier.deliver(recipients) if recipients.present?
     end
   end
 end

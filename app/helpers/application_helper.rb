@@ -1,4 +1,30 @@
 module ApplicationHelper
+  def unread_notifications_count
+    return 0 unless user_signed_in?
+    current_user.notifications.unread.count
+  end
+
+  # SVG path(s) for a notifier's icon key. Kept small and inline so the
+  # notification list needs no icon assets.
+  def notification_icon_svg(key)
+    paths = case key.to_s
+    when "cash"  then '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>'
+    when "alert" then '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+    when "check" then '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
+    else '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'
+    end
+    raw %(<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">#{paths}</svg>)
+  end
+
+  def notification_tone(category)
+    case category.to_s
+    when "payment", "import" then "bg-primary/15 text-primary"
+    when "security", "alert" then "bg-destructive/15 text-destructive"
+    when "payout" then "bg-amber-500/15 text-amber-500"
+    else "bg-muted text-muted-foreground"
+    end
+  end
+
   def status_dot(status)
     case status.to_s
     when "paid" then "bg-emerald-500"
@@ -83,7 +109,7 @@ module ApplicationHelper
   def base64_logo(account)
     return unless account.logo.attached?
 
-    logo = account.logo.variant(resize_to_limit: [400, 160]).processed
+    logo = account.logo.variant(resize_to_limit: [ 400, 160 ]).processed
     data = Base64.strict_encode64(logo.download)
     mime = logo.blob.content_type
     "data:#{mime};base64,#{data}"
@@ -96,7 +122,7 @@ module ApplicationHelper
       "shield" => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       "file" => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
       "chart" => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-      "sync" => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>',
+      "sync" => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>'
     }
     icons[name].html_safe
   end

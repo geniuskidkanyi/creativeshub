@@ -1,0 +1,45 @@
+<div class="px-6 py-6 max-w-2xl">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl text-foreground" style="font-family: var(--font-display)">Notifications</h1>
+      <p class="text-sm text-muted-foreground mt-1"><%= @unread_count.positive? ? pluralize(@unread_count, "unread notification") : "You're all caught up" %></p>
+    </div>
+    <% if @unread_count.positive? %>
+      <%= button_to "Mark all read", read_all_notifications_path, method: :patch,
+            class: "shrink-0 px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <% if @notifications.any? %>
+    <div class="bg-card border border-border rounded-lg divide-y divide-border overflow-hidden">
+      <% @notifications.each do |notification| %>
+        <% event = notification.event %>
+        <%= link_to read_notification_path(notification), data: { turbo_method: :patch },
+              class: "flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30 #{'bg-primary/[0.04]' if notification.read_at.nil?}" do %>
+          <span class="shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center <%= notification_tone(event.category) %>">
+            <%= notification_icon_svg(event.icon) %>
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-foreground font-medium truncate"><%= event.title %></span>
+              <% if notification.read_at.nil? %>
+                <span class="shrink-0 w-2 h-2 rounded-full bg-primary" title="Unread"></span>
+              <% end %>
+            </div>
+            <p class="text-sm text-muted-foreground mt-0.5"><%= event.message %></p>
+            <p class="text-xs text-muted-foreground/70 mt-1"><%= time_ago_in_words(notification.created_at) %> ago</p>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% else %>
+    <div class="bg-card border border-border rounded-lg p-12 text-center">
+      <span class="inline-flex w-12 h-12 rounded-full bg-muted items-center justify-center text-muted-foreground mb-4">
+        <%= notification_icon_svg("bell") %>
+      </span>
+      <p class="text-muted-foreground">No notifications yet. Payments, payouts and imports will show up here.</p>
+    </div>
+  <% end %>
+</div>

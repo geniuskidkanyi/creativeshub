@@ -10,12 +10,25 @@ class ProcessWaveImportJob < ApplicationJob
       Rails.logger.info "[WaveImporter] import=#{wave_import.id} downloaded to=#{path} size_on_disk=#{File.size(path)}"
       mode == :preview ? run_preview(wave_import, path) : run_commit(wave_import, path)
     end
+    notify_import_finished(wave_import) if mode == :commit
   rescue StandardError => e
     Rails.logger.error "[WaveImporter] import=#{wave_import.id} FAILED #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     wave_import.update!(status: :failed, error_message: "#{e.class}: #{e.message}")
+    notify_import_finished(wave_import) if mode == :commit
   end
 
   private
+
+  # Tell the account the import finished (or failed) — they may have navigated
+  # away from the auto-refreshing page.
+  def notify_import_finished(wave_import)
+    recipients = wave_import.account.notification_recipients
+    return if recipients.blank?
+
+    ImportCompletedNotifier.with(wave_import: wave_import).deliver(recipients)
+  rescue StandardError => e
+    Rails.logger.warn "[WaveImporter] import=#{wave_import.id} notify failed: #{e.class}: #{e.message}"
+  end
 
   # One line describing the blob that was actually uploaded — filename,
   # declared content type, stored byte size, checksum and which storage

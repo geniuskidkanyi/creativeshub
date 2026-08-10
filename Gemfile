@@ -75,6 +75,9 @@ gem "pagy"
 # Full-text search over Postgres (tsearch + trigram), account-scoped.
 gem "pg_search"
 
+# In-app + email notifications
+gem "noticed"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
