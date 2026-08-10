@@ -1,0 +1,49 @@
+# SolidQueue worker for SmartPay — the process that actually runs background
+# jobs (imports, emails, recurring invoices, notifications). Mirrors the
+# hand-managed smartpay-puma unit.
+#
+# ── One-time server setup (as a sudo-capable user) ──────────────────────────
+#   sudo cp /home/deploy/smartpay/current/deploy/smartpay-jobs.service \
+#           /etc/systemd/system/smartpay-jobs.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now smartpay-jobs
+#   sudo systemctl status smartpay-jobs          # confirm "active (running)"
+#
+# ── Passwordless sudo for the deploy user (so Capistrano can restart it) ─────
+#   Add to /etc/sudoers.d/smartpay (mirror the existing smartpay-puma line):
+#   deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl start smartpay-jobs, \
+#     /usr/bin/systemctl stop smartpay-jobs, /usr/bin/systemctl restart smartpay-jobs
+#
+# Do the above BEFORE the next deploy — the `after deploy:finished` hook runs
+# `sudo -n systemctl restart smartpay-jobs`, which fails loudly if the unit or
+# sudoers rule is missing.
+
+[Unit]
+Description=SmartPay SolidQueue worker (bin/jobs)
+After=network.target
+# If PostgreSQL runs on this same host, also gate on it:
+# After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+
+# Runs from the Capistrano `current` symlink so each restart picks up the
+# newest release. Secrets come from the symlinked config/master.key,
+# config/database.yml and .env (loaded by dotenv-rails at boot) — same as Puma.
+WorkingDirectory=/home/deploy/smartpay/current
+Environment=RAILS_ENV=production
+
+# rbenv user install: the shim resolves Ruby from .ruby-version in the workdir.
+ExecStart=/home/deploy/.rbenv/shims/bundle exec bin/jobs
+
+Restart=always
+RestartSec=5
+
+# Let SolidQueue finish/return in-flight jobs cleanly on stop and deploy.
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
