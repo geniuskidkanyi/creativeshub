@@ -39,6 +39,7 @@ Rails.application.routes.draw do
     member do
       get :pay
       post :send_invoice
+      post :resend_email
       post :mark_paid
       post :mark_unpaid
     end
@@ -76,6 +77,7 @@ Rails.application.routes.draw do
     resources :invoices, only: [ :show ], param: :token, path: "" do
       member do
         get :pay
+        get :open
       end
     end
   end

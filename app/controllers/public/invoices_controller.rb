@@ -2,7 +2,7 @@ class Public::InvoicesController < ApplicationController
   skip_before_action :authenticate_user!
   skip_before_action :require_account!
 
-  before_action :set_invoice
+  before_action :set_invoice, only: [ :show, :pay ]
 
   def show
   end
@@ -58,7 +58,18 @@ class Public::InvoicesController < ApplicationController
     redirect_to public_invoice_path(@invoice.public_token), alert: "Payment could not be initiated. #{e.record.errors.full_messages.to_sentence}"
   end
 
+  # 1x1 tracking pixel embedded in the invoice email. Loading it (when the
+  # client's mail app fetches images) records an open. Always returns the gif,
+  # even for an unknown token, so it never looks broken in the email.
+  def open
+    Invoice.find_by(public_token: params[:token])&.register_email_open!
+    send_data TRACKING_PIXEL, type: "image/gif", disposition: "inline"
+  end
+
   private
+
+  # A 1x1 transparent GIF.
+  TRACKING_PIXEL = Base64.decode64("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7").freeze
 
   def set_invoice
     @invoice = Invoice.find_by!(public_token: params[:token])

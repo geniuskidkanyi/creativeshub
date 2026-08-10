@@ -65,12 +65,11 @@ Rails.application.configure do
   # SMTP settings
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: Rails.application.credentials.smtp_address!,
-    port: Rails.application.credentials.smtp_port!,
-    user_name: Rails.application.credentials.smtp_user!,
-    password: Rails.application.credentials.smtp_password!,
+    address: 'smtp.purelymail.com',
+    port: '465',
+    user_name: 'noreply@smartpay.gm',
+    password: '8Ie6Fh82qnGD',
     authentication: :plain,
-    enable_starttls_auto: true,
     open_timeout: 5,
     read_timeout: 5
   }

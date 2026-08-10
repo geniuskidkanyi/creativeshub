@@ -1,5 +1,5 @@
 class InvoicesController < ApplicationController
-  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :pay, :send_invoice, :mark_paid, :mark_unpaid ]
+  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :pay, :send_invoice, :resend_email, :mark_paid, :mark_unpaid ]
 
   def index
     @q = params[:q].to_s.strip
@@ -69,7 +69,20 @@ class InvoicesController < ApplicationController
     end
 
     InvoiceMailer.send_invoice(@invoice).deliver_later
+    @invoice.mark_email_sent!
     redirect_to @invoice, notice: "Invoice marked as sent and emailed to client."
+  end
+
+  # Re-sends the invoice email without changing status — for chasing an
+  # unanswered invoice.
+  def resend_email
+    unless @invoice.client.emailable?
+      return redirect_to @invoice, alert: "#{@invoice.client.name} has no email on file. Share the payment link instead."
+    end
+
+    InvoiceMailer.send_invoice(@invoice).deliver_later
+    @invoice.mark_email_sent!
+    redirect_to @invoice, notice: "Invoice re-sent to #{@invoice.client.email}."
   end
 
   # Records an invoice settled off-platform (cash, bank transfer, cheque…).

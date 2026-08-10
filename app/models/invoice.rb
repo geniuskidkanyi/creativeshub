@@ -50,6 +50,26 @@ class Invoice < ApplicationRecord
     update!(status: :sent)
   end
 
+  # Recorded when the invoice email is (re)sent to the client.
+  def mark_email_sent!
+    update_columns(email_sent_at: Time.current, updated_at: Time.current)
+  end
+
+  def emailed? = email_sent_at.present?
+  def email_opened? = email_opened_at.present?
+
+  # Called by the tracking pixel. First open sets the timestamp; every open
+  # bumps the count. update_columns avoids callbacks/validations on a hot,
+  # unauthenticated path.
+  def register_email_open!
+    now = Time.current
+    update_columns(
+      email_opened_at: email_opened_at || now,
+      email_opens: email_opens + 1,
+      updated_at: now
+    )
+  end
+
   def mark_as_paid!(method: nil, paid_at: Time.current)
     update!(status: :paid, payment_method: method, paid_date: paid_at)
   end

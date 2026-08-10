@@ -15,6 +15,17 @@
         <% if @invoice.paid? && @invoice.payment_method.present? %>
           <p class="text-xs text-primary mt-0.5">Paid via <%= @invoice.payment_method.humanize %><%= " on #{@invoice.paid_date.to_date.to_fs(:long)}" if @invoice.paid_date %></p>
         <% end %>
+        <% if @invoice.emailed? %>
+          <p class="text-xs text-muted-foreground mt-0.5">
+            <svg class="inline w-3.5 h-3.5 -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            Emailed <%= @invoice.email_sent_at.to_date.to_fs(:long) %>
+            <% if @invoice.email_opened? %>
+              · <span class="text-primary font-medium">Opened<%= " #{@invoice.email_opens}×" if @invoice.email_opens > 1 %></span> <%= time_ago_in_words(@invoice.email_opened_at) %> ago
+            <% else %>
+              · <span class="text-muted-foreground">not opened yet</span>
+            <% end %>
+          </p>
+        <% end %>
       </div>
       <div class="flex items-center gap-2" data-controller="modal">
         <%= link_to invoice_path(@invoice, format: :pdf), class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors" do %>
@@ -31,6 +42,11 @@
           </span>
           <span data-clipboard-target="label">Copy Link</span>
         </button>
+        <% if @invoice.client.emailable? %>
+          <%= button_to @invoice.emailed? ? "Resend email" : "Send email", resend_email_invoice_path(@invoice), method: :post,
+                class: "inline-flex items-center gap-1.5 px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/80 transition-colors cursor-pointer" %>
+        <% end %>
+
         <% if @invoice.paid? %>
           <% if @invoice.payments.succeeded.none? %>
             <%# Only a manual mark-as-paid can be reversed; real online payments can't. %>

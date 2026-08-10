@@ -202,18 +202,18 @@
                 <%# Images inlined as base64: Active Storage URLs aren't
                     generatable here and wkhtmltopdf couldn't fetch them anyway. %>
                 <%= image_tag(asset_data_uri("smart-pay-logo.png"), alt: "SmartPay", style: "height: 30px; width: auto; vertical-align: middle;") %>
-                <% if current_account.logo.attached? %>
+                <% if @invoice.account.logo.attached? %>
                   <span class="sender-logo" style="margin-left: 12px; padding-left: 14px; border-left: 1px solid #dde1ea;">
-                    <%= image_tag base64_logo(current_account), alt: current_account.business_name %>
+                    <%= image_tag base64_logo(@invoice.account), alt: @invoice.account.business_name %>
                   </span>
                 <% end %>
               </div>
-              <p class="sender-info"><%= current_account.business_name %></p>
-              <% if current_account.phone.present? || current_account.website.present? %>
-                <p class="sender-info"><%= [current_account.phone, current_account.website].compact.join(" · ") %></p>
+              <p class="sender-info"><%= @invoice.account.business_name %></p>
+              <% if @invoice.account.phone.present? || @invoice.account.website.present? %>
+                <p class="sender-info"><%= [@invoice.account.phone, @invoice.account.website].compact.join(" · ") %></p>
               <% end %>
-              <% if current_account.address.present? %>
-                <p class="sender-info"><%= current_account.address %></p>
+              <% if @invoice.account.address.present? %>
+                <p class="sender-info"><%= @invoice.account.address %></p>
               <% end %>
             </td>
             <td class="right">
@@ -344,7 +344,7 @@
       <div class="footer">
         <table class="footer-table">
           <tr>
-            <td class="left">SMARTPAY · <%= current_account.business_name&.upcase %></td>
+            <td class="left">SMARTPAY · <%= @invoice.account.business_name&.upcase %></td>
             <td class="center">
               <span class="footer-dot gold"></span>
               <span class="footer-dot"></span>
