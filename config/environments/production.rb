@@ -64,14 +64,12 @@ Rails.application.configure do
 
   # SMTP settings
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
+ config.action_mailer.smtp_settings = {
     address: 'smtp.purelymail.com',
     port: '465',
     user_name: 'noreply@smartpay.gm',
     password: '8Ie6Fh82qnGD',
-    authentication: :plain,
-    open_timeout: 5,
-    read_timeout: 5
+    ssl: true,
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
