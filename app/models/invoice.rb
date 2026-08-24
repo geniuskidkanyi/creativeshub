@@ -31,6 +31,7 @@ class Invoice < ApplicationRecord
   validates :status, presence: true
   validates :currency, inclusion: { in: CURRENCIES.keys }
   validates :fx_rate, numericality: { greater_than: 0 }
+  validates :discount, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :normalize_currency
   before_create :generate_invoice_number
@@ -81,8 +82,12 @@ class Invoice < ApplicationRecord
   def calculate_totals
     self.subtotal = invoice_items.reject(&:marked_for_destruction?).sum { |item| (item.quantity || 0) * (item.unit_price || 0) }
     self.tax_rate ||= 0
-    self.tax_amount = (subtotal * tax_rate / 100.0).round(2)
-    self.total_amount = (subtotal + tax_amount).round(2)
+    self.discount ||= 0
+    # Discount comes off the subtotal before tax; never let it push the base
+    # below zero.
+    taxable = [ subtotal - discount, 0 ].max
+    self.tax_amount = (taxable * tax_rate / 100.0).round(2)
+    self.total_amount = (taxable + tax_amount).round(2)
   end
 
   # The invoice total converted to GMD at its locked rate — this is what the

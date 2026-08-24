@@ -45,16 +45,18 @@ export default class extends Controller {
     this.hintTarget.classList.toggle("hidden", !(gmd > 0))
   }
 
-  // Sums visible line items so the hint reflects the current invoice total
-  // without depending on another controller.
+  // Sums visible line items (less any discount) so the hint reflects the
+  // current invoice total without depending on another controller.
   readTotal() {
-    return Array.from(this.element.querySelectorAll("[data-invoice-item]"))
+    const subtotal = Array.from(this.element.querySelectorAll("[data-invoice-item]"))
       .filter((row) => !row.classList.contains("hidden"))
       .reduce((sum, row) => {
         const qty = parseFloat(row.querySelector("[name*='[quantity]']")?.value) || 0
         const price = parseFloat(row.querySelector("[name*='[unit_price]']")?.value) || 0
         return sum + qty * price
       }, 0)
+    const discount = parseFloat(this.element.querySelector("[name*='[discount]']")?.value) || 0
+    return Math.max(subtotal - discount, 0)
   }
 
   symbolFor(code) {

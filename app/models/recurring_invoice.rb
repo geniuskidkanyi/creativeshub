@@ -34,6 +34,7 @@ class RecurringInvoice < ApplicationRecord
   validates :due_in_days, numericality: { greater_than_or_equal_to: 0, only_integer: true }
   validates :currency, inclusion: { in: CURRENCIES.keys }
   validates :fx_rate, numericality: { greater_than: 0 }
+  validates :discount, numericality: { greater_than_or_equal_to: 0 }
   validate :start_date_not_in_past
   validate :end_date_after_start_date
   validate :must_have_items
@@ -59,7 +60,8 @@ class RecurringInvoice < ApplicationRecord
   end
 
   def estimated_total
-    (subtotal * (1 + (tax_rate || 0) / 100.0)).round(2)
+    taxable = [ subtotal - (discount || 0), 0 ].max
+    (taxable * (1 + (tax_rate || 0) / 100.0)).round(2)
   end
 
   # True once the schedule has produced everything it was asked to produce.

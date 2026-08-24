@@ -61,6 +61,15 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.purelymail.com',
+    port: '465',
+    user_name: 'noreply@smartpay.gm',
+    password: '8Ie6Fh82qnGD',
+    ssl: true,
+  }
+
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 

@@ -45,6 +45,7 @@ class RecurringInvoiceGenerator
       issue_date: issue_on,
       due_date: issue_on + @schedule.due_in_days.days,
       tax_rate: @schedule.tax_rate,
+      discount: @schedule.discount,
       currency: @schedule.currency,
       fx_rate: @schedule.fx_rate,
       notes: @schedule.notes,

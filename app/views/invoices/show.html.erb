@@ -170,6 +170,12 @@
           <span>Subtotal</span>
           <span class="text-foreground"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></span>
         </div>
+        <% if @invoice.discount.to_f > 0 %>
+          <div class="flex justify-between text-sm text-muted-foreground">
+            <span>Discount</span>
+            <span class="text-foreground">−<%= @invoice.currency_symbol %><%= number_with_precision(@invoice.discount, precision: 0) %></span>
+          </div>
+        <% end %>
         <% if @invoice.tax_rate.to_f > 0 %>
           <div class="flex justify-between text-sm text-muted-foreground">
             <span>Tax (<%= @invoice.tax_rate %> %)</span>

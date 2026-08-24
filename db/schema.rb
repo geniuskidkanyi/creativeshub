@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_181803) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_182109) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -94,6 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_181803) do
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
     t.string "currency", default: "GMD", null: false
+    t.decimal "discount", precision: 12, scale: 2, default: "0.0", null: false
     t.date "due_date"
     t.datetime "email_opened_at"
     t.integer "email_opens", default: 0, null: false
@@ -226,6 +227,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_181803) do
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
     t.string "currency", default: "GMD", null: false
+    t.decimal "discount", precision: 12, scale: 2, default: "0.0", null: false
     t.integer "due_in_days", default: 14, null: false
     t.date "end_date"
     t.string "frequency", default: "monthly", null: false

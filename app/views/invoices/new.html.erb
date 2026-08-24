@@ -124,12 +124,16 @@
     </div>
 
     <div class="bg-card border border-border rounded-lg p-5 mb-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div>
           <%= f.label :currency, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
           <%= f.select :currency, Invoice.currency_options, {},
                 data: { currency_target: "select", action: "currency#update" },
                 class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div>
+          <%= f.label :discount, "Discount", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :discount, step: "0.01", min: "0", value: @invoice.discount || 0, data: { action: "currency#update" }, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
         </div>
         <div>
           <%= f.label :tax_rate, "Tax Rate (%)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>

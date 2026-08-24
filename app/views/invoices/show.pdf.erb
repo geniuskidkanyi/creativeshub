@@ -286,6 +286,12 @@
             <td class="label">Subtotal</td>
             <td class="val"><%= @invoice.currency_symbol %><%= number_with_precision(@invoice.subtotal || 0, precision: 0) %></td>
           </tr>
+          <% if @invoice.discount.to_f > 0 %>
+            <tr class="border">
+              <td class="label">Discount</td>
+              <td class="val">−<%= @invoice.currency_symbol %><%= number_with_precision(@invoice.discount, precision: 0) %></td>
+            </tr>
+          <% end %>
           <% if @invoice.tax_rate.to_f > 0 %>
             <tr class="border">
               <td class="label">Tax (<%= @invoice.tax_rate %> %)</td>
@@ -346,9 +352,7 @@
           <tr>
             <td class="left">SMARTPAY · <%= @invoice.account.business_name&.upcase %></td>
             <td class="center">
-              <span class="footer-dot gold"></span>
-              <span class="footer-dot"></span>
-              <span class="footer-dot"></span>
+              <a href="<%= Rails.configuration.x.public_host %>" style="color:#355bbd;text-decoration:none;letter-spacing:0.06em;">smartpay.gm</a>
             </td>
             <td class="right">Thank you for your business.</td>
           </tr>

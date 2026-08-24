@@ -108,7 +108,9 @@ export default class extends Controller {
   recalc() {
     const subtotal = this.lineItems().reduce((sum, row) => sum + row.qty * row.price, 0)
     const taxRate = parseFloat(this.field("tax_rate")?.value) || 0
-    const total = subtotal * (1 + taxRate / 100)
+    const discount = parseFloat(this.field("discount")?.value) || 0
+    const taxable = Math.max(subtotal - discount, 0)
+    const total = taxable * (1 + taxRate / 100)
     this.totalTargets.forEach((el) => (el.textContent = this.money(total)))
     this.updateCurrencyHint(total)
   }
@@ -172,7 +174,8 @@ export default class extends Controller {
 
   currentTotal() {
     const subtotal = this.lineItems().reduce((sum, row) => sum + row.qty * row.price, 0)
-    return subtotal * (1 + (parseFloat(this.field("tax_rate")?.value) || 0) / 100)
+    const taxable = Math.max(subtotal - (parseFloat(this.field("discount")?.value) || 0), 0)
+    return taxable * (1 + (parseFloat(this.field("tax_rate")?.value) || 0) / 100)
   }
 
   fail(step, message) {

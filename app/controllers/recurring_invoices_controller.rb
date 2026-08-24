@@ -74,7 +74,7 @@ class RecurringInvoicesController < ApplicationController
   def recurring_invoice_params
     params.require(:recurring_invoice).permit(
       :client_id, :title, :frequency, :interval, :start_date, :end_date, :max_occurrences,
-      :due_in_days, :tax_rate, :notes, :auto_send, :currency, :fx_rate,
+      :due_in_days, :tax_rate, :discount, :notes, :auto_send, :currency, :fx_rate,
       recurring_invoice_items_attributes: [ :id, :description, :details, :quantity, :unit_price, :position, :_destroy ]
     )
   end
