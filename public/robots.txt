@@ -1,1 +1,22 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# See https://www.robotstxt.org/robotstxt.html for documentation.
+
+User-agent: *
+Allow: /
+
+# Private / authenticated areas — nothing to index here.
+Disallow: /users/
+Disallow: /dashboard
+Disallow: /invoices
+Disallow: /clients
+Disallow: /products
+Disallow: /recurring_invoices
+Disallow: /payouts
+Disallow: /imports
+Disallow: /notifications
+Disallow: /account
+Disallow: /qr
+Disallow: /scan/
+Disallow: /inv/
+Disallow: /platformadmin/
+
+Sitemap: https://smartpay.gm/sitemap.xml

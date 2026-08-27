@@ -11,6 +11,9 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # SEO: XML sitemap for Google Search Console.
+  get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: "xml" }
+
   authenticated :user do
     root "dashboard#show", as: :authenticated_root
   end

@@ -1,9 +1,68 @@
 <!DOCTYPE html>
 <html data-controller="theme" data-theme="dark">
   <head>
-    <title>SmartPay — Get Paid Smartly</title>
+    <title>SmartPay — Get paid smartly in The Gambia | Invoicing & Payments</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="The payment platform built for Gambian businesses and freelancers. Accept Wave, Visa, Afrimoney, QMoney, and APS.">
+    <%
+      seo_host = Rails.configuration.x.public_host
+      seo_url  = "#{seo_host}#{request.path}"
+      seo_desc = "SmartPay is the payment platform for Gambian businesses and freelancers — send professional invoices and get paid instantly via Wave, Afrimoney, QMoney, APS, Visa and Mastercard. Free invoice generator, recurring invoices and multi-currency, built for The Gambia."
+      seo_image = (image_url("free_invoice_generator.png") rescue "#{seo_host}/icon.png")
+      seo_title = "SmartPay — Get paid smartly in The Gambia"
+    %>
+    <meta name="description" content="<%= seo_desc %>">
+    <meta name="keywords" content="SmartPay, SmartPay Gambia, online payments Gambia, payment gateway Gambia, invoicing Gambia, free invoice generator, invoice software Gambia, accept payments online, Wave payments, Afrimoney, QMoney, APS, Visa, Mastercard, mobile money Gambia, recurring invoices, multi-currency invoicing, get paid online, freelancer invoicing Gambia, business payments Gambia">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="SmartPay">
+    <link rel="canonical" href="<%= seo_url %>">
+
+    <%# Open Graph (Facebook, WhatsApp, LinkedIn) %>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SmartPay">
+    <meta property="og:title" content="<%= seo_title %>">
+    <meta property="og:description" content="<%= seo_desc %>">
+    <meta property="og:url" content="<%= seo_url %>">
+    <meta property="og:image" content="<%= seo_image %>">
+    <meta property="og:locale" content="en_GB">
+
+    <%# Twitter / X %>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= seo_title %>">
+    <meta name="twitter:description" content="<%= seo_desc %>">
+    <meta name="twitter:image" content="<%= seo_image %>">
+
+    <script type="application/ld+json">
+    <%= raw({
+      "@context" => "https://schema.org",
+      "@graph" => [
+        {
+          "@type" => "Organization",
+          "@id" => "#{seo_host}/#organization",
+          "name" => "SmartPay",
+          "url" => seo_host,
+          "logo" => (image_url("smart-pay-logo.png") rescue "#{seo_host}/icon.png"),
+          "areaServed" => "GM",
+          "description" => seo_desc
+        },
+        {
+          "@type" => "WebSite",
+          "@id" => "#{seo_host}/#website",
+          "url" => seo_host,
+          "name" => "SmartPay",
+          "publisher" => { "@id" => "#{seo_host}/#organization" }
+        },
+        {
+          "@type" => "SoftwareApplication",
+          "name" => "SmartPay",
+          "applicationCategory" => "FinanceApplication",
+          "operatingSystem" => "Web",
+          "url" => seo_host,
+          "description" => seo_desc,
+          "offers" => { "@type" => "Offer", "price" => "0", "priceCurrency" => "GMD" }
+        }
+      ]
+    }.to_json) %>
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SmartPay">
