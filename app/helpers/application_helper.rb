@@ -1,4 +1,11 @@
 module ApplicationHelper
+  # Render GA only when a measurement ID is set and we're in production (or a
+  # deliberate GA_FORCE for staging/QA) — never from local dev.
+  def google_analytics_enabled?
+    Rails.configuration.x.google_analytics_id.present? &&
+      (Rails.env.production? || ENV["GA_FORCE"] == "true")
+  end
+
   def unread_notifications_count
     return 0 unless user_signed_in?
     current_user.notifications.unread.count

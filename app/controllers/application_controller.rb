@@ -9,6 +9,15 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Queues a GA4 event to fire on the next rendered page. Stored in the flash
+  # so it survives the redirect that follows most tracked actions (sign up,
+  # log in). Event names/params come from our own code, never user input.
+  def track_ga_event(name, params = {})
+    events = flash[:ga_events] || []
+    events << { "name" => name.to_s, "params" => params.stringify_keys }
+    flash[:ga_events] = events
+  end
+
   def layout_by_controller
     devise_controller? ? "landing" : "application"
   end
