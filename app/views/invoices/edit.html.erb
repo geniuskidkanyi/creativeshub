@@ -1,4 +1,4 @@
-<div class="px-6 py-6 lg:px-9 lg:py-8 max-w-[1240px] mx-auto" data-controller="invoice-form client-search"
+<div class="px-6 py-6 lg:px-9 lg:py-8 max-w-[1240px] mx-auto" data-controller="invoice-form client-search currency"
      data-client-search-url-value="<%= search_clients_path %>"
      data-client-search-selected-id-value="<%= @invoice.client_id %>"
      data-client-search-selected-name-value="<%= @invoice.client.name %>">
@@ -128,16 +128,29 @@
     </div>
 
     <div class="bg-card border border-border rounded-lg p-5 mb-4">
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div>
+          <%= f.label :currency, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.select :currency, Invoice.currency_options, {},
+                data: { currency_target: "select", action: "currency#update" },
+                class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
         <div>
           <%= f.label :discount, "Discount", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
-          <%= f.number_field :discount, step: "0.01", min: "0", value: @invoice.discount || 0, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+          <%= f.number_field :discount, step: "0.01", min: "0", value: @invoice.discount || 0, data: { action: "currency#update" }, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
         </div>
         <div>
           <%= f.label :tax_rate, "Tax Rate (%)", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
-          <%= f.number_field :tax_rate, step: "0.01", min: "0", class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+          <%= f.number_field :tax_rate, step: "0.01", min: "0", value: @invoice.tax_rate || 0, data: { action: "currency#update" }, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
+        </div>
+        <div data-currency-target="rateField" class="<%= "hidden" if @invoice.base_currency? %>">
+          <%= f.label :fx_rate, "Rate to GMD", class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
+          <%= f.number_field :fx_rate, step: "any", min: "0", value: @invoice.fx_rate || 1, data: { currency_target: "rate", action: "currency#update" }, class: "w-full rounded-md border border-border bg-input-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
         </div>
       </div>
+      <p data-currency-target="hint" class="hidden text-xs text-muted-foreground mt-3">
+        Shown to the client in <span data-currency-target="symbol">D</span>. Charged in Dalasi at your rate — customer pays about <span data-currency-target="hintAmount" class="text-foreground font-medium">D0</span>.
+      </p>
       <div class="mt-4">
         <%= f.label :notes, class: "block text-xs text-muted-foreground uppercase tracking-wider mb-1.5" %>
         <%= f.text_area :notes, rows: 3, placeholder: "Payment terms, additional notes...", class: "w-full rounded-md border border-border bg-input-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" %>
